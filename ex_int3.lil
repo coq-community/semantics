@@ -1,0 +1,9 @@
+[between(10, 20, x)/\True()/\True()]
+y:=0;
+[between(10, 20, x)/\between(0, 0, y)/\True()]
+while y<x do
+[between(10, 20, x)/\between(0, 20, y)/\True()]
+[between(10, 20, x)/\between(0, 19, y)/\True()]
+y:=y+1
+done
+[between(10, 20, x)/\between(10, 20, y)/\True()]

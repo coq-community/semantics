@@ -1,0 +1,14 @@
+variables
+  x 0  y 1  z 0  v 0
+in
+  while x < 6 do
+    x := x+1; z:= 0;
+    v := y; y := 0;
+    while z < x do
+      z := z + 1;
+      y := y + v
+    done
+  done
+end
+
+  

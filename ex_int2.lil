@@ -1,0 +1,9 @@
+variables
+  x 10 20
+  y minfty pinfty
+in
+  y := 0;
+  while y < x do
+    y:= 0
+  done
+end

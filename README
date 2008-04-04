@@ -1,0 +1,76 @@
+These files describe several approaches to the description of a simple
+programming language using the Coq system.
+
+syntax. the constructs of the language
+
+little. operational semantics in three forms: natural semantics (also know
+  as big-step semantics), structural operational semantics (small-step
+  semantics), and a functional implementation of the latter.  This file
+  also contains the proof that the three point descriptions are equivalent.
+
+function_cpo.  A description of partial functions and Tarski's fixpoint theorem.
+
+constructs.  A proof that the constructs of the programming language are
+  continuous, with respect to the notion of continuity given in function_cpo
+
+denot. A description of the programming language in the style of denotational
+  semantics.  This file also contains the proof that denotational semantics
+  and natural semantics are equivalent.
+
+axiom. Hoare triples and Dijkstra's weakest pre-condition calculs, in the form
+  of a verification condition generator.  This   file also contains a proof that
+  the axiomatic semantics (base on Hoare triples) and the vcg are sound with
+  respect to the natural semantics.
+
+intervals. A notion of intervals to be used in an abstract interpreter.
+  A type of extended integers is defined to incorporate infinities (minfty
+  and pinfty) and intervals are defined as pairs of extended integers
+  (this accepts the meaningless intervals of the form (minfty, minfty), but
+  they do not cause any problem).  Different forms additions and comparisons
+  are defined for extended integers and intervals.
+
+abstract_i.  An abstract interpreter defined as a parameterized module over
+  a notion of abstract domain.  This abstract interpreter is instantiated
+  with the intervals defined above.
+
+little_w_string.  The whole development is defined as a set of modules
+  parameterized by a notion of strings.  This file instantiate the development
+  on the string package provided in Coq.
+
+parser. A parser for the language and assertions, which can be hooked on all
+  the tools.  This is nice for the examples.  There are no proofs on this
+  parser, and when parsing fails, it simply returns the "skip" program.
+
+example, example2, ex_i.  These are examples where the abstract interpreter,
+  and the vcg are used in a reflective manner directly inside Coq.
+
+extract_interpret.  This file contains the directives to extract code from
+  the proved tools.
+
+
+This development also comes with ml files used to encapsulate the extracted
+code.
+
+str_little.ml  A definition of the module of strings as needed for the
+  extracted code, but this module is based on ocaml native strings.
+
+parse_little.mly A parser description using the yacc extension of ocaml
+llex.mll the lexical analyser to be used with the parser.
+
+little.ml basic encapsulation: a single command is generated, with four
+  options
+   -interpreter (just to execute a program)
+   -vcg (to generate the conditions for the verification of an
+         annotated program)
+   -vcg-coq (to generatedthe conditions in coq syntax)
+   -static-analysis (to run the abstract interpreter).
+
+This work is described very briefly in an article
+
+  "Theorem proving support in programming language semantics"
+
+available from the hal.inria.fr open archive
+
+http://hal.inria.fr/inria-00160309
+
+A much longer description should be published soon.
