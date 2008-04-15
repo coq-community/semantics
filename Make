@@ -1,0 +1,38 @@
+-R . Semantics
+abstract_i.v
+axiom.v
+constructs.v
+context_sqrt.v
+denot.v
+example2.v
+example.v
+ex_i.v
+extract_interpret.v
+function_cpo.v
+intervals.v
+little.v
+little_w_string.v
+parser.v
+syntax.v
+interp.ml
+str_little.ml
+-custom "$(CAMLBIN)ocamlc -rectypes -c llex.ml" "llex.ml parse_little.cmi" llex.cmo
+-custom "$(CAMLBIN)ocamlc -rectypes -c parse_little.ml" "parse_little.cmi parse_little.ml interp.cmi str_little.cmo" parse_little.cmo
+-custom 
+	"$(CAMLBIN)ocamlc -rectypes -o little interp.cmo nums.cma str_little.cmo parse_little.cmo llex.cmo little.ml"
+	"str_little.cmo interp.cmi interp.cmo parse_little.cmo llex.cmo little.ml" 
+	little
+-custom 
+	"$(CAMLBIN)ocamlyacc parse_little.mly"
+	"parse_little.mly"
+	"parse_little.mli parse_little.ml"
+-custom "$(CAMLBIN)ocamllex llex.mll" llex.mll llex.ml
+-custom 
+	"./little -vcg-coq < sqrt.lil | cat context_sqrt.v - tail_sqrt.v > proof_sqrt.v"	
+	"context_sqrt.v tail_sqrt.v sqrt.lil little"
+	proof_sqrt.v
+-custom "./little -static-analysis < ex_int.lil > test_vcg.lil"
+	"ex_int.lil little"
+	test_vcg.lil
+
+
