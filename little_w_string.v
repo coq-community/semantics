@@ -134,5 +134,5 @@ Definition bind (A B:Type) (x:option A)(f:A->option B) : (option B) :=
 Implicit Arguments bind.
 
 Notation "a /\ b" := (a_conj a b) : a_scope.
-Notation "a ==> b" := (c_imp a b) (at level 55, right associativity) : a_scope.
+Notation "a ==> b" := (c_imp a b) (at level 90, right associativity) : a_scope.
 Notation "! a" := (a_not a) (at level 30) : a_scope.
