@@ -23,7 +23,8 @@
 #                       #
 #########################
 
-OCAMLLIBS:=
+CAMLP4LIB:=$(shell $(CAMLBIN)camlp5 -where 2> /dev/null || $(CAMLBIN)camlp4 -where)
+OCAMLLIBS:=-I $(CAMLP4LIB) 
 COQLIBS:= -R . Semantics
 COQDOCLIBS:=-R . Semantics
 
@@ -33,20 +34,10 @@ COQDOCLIBS:=-R . Semantics
 #                        #
 ##########################
 
-CAMLP4LIB:=$(shell $(CAMLBIN)camlp5 -where 2> /dev/null || $(CAMLBIN)camlp4 -where)
 CAMLP4:=$(notdir $(CAMLP4LIB))
-COQSRC:=-I $(COQTOP)/kernel -I $(COQTOP)/lib \
-  -I $(COQTOP)/library -I $(COQTOP)/parsing \
-  -I $(COQTOP)/pretyping -I $(COQTOP)/interp \
-  -I $(COQTOP)/proofs -I $(COQTOP)/syntax -I $(COQTOP)/tactics \
-  -I $(COQTOP)/toplevel -I $(COQTOP)/contrib/correctness \
-  -I $(COQTOP)/contrib/extraction -I $(COQTOP)/contrib/field \
-  -I $(COQTOP)/contrib/fourier -I $(COQTOP)/contrib/graphs \
-  -I $(COQTOP)/contrib/interface -I $(COQTOP)/contrib/jprover \
-  -I $(COQTOP)/contrib/omega -I $(COQTOP)/contrib/romega \
-  -I $(COQTOP)/contrib/ring -I $(COQTOP)/contrib/xml \
-  -I $(CAMLP4LIB)
-ZFLAGS:=$(OCAMLLIBS) $(COQSRC)
+COQSRC:=$(shell $(COQBIN)coqc -where)
+COQSRCLIBS:=-I $(COQSRC)
+ZFLAGS:=$(OCAMLLIBS) $(COQSRCLIBS)
 OPT:=
 COQFLAGS:=-q $(OPT) $(COQLIBS) $(OTHERFLAGS) $(COQ_XML)
 COQC:=$(COQBIN)coqc
@@ -54,12 +45,12 @@ COQDEP:=$(COQBIN)coqdep -c
 GALLINA:=$(COQBIN)gallina
 COQDOC:=$(COQBIN)coqdoc
 CAMLC:=$(CAMLBIN)ocamlc -rectypes -c
-CAMLOPTC:=$(CAMLBIN)ocamlopt -c
-CAMLLINK:=$(CAMLBIN)ocamlc
-CAMLOPTLINK:=$(CAMLBIN)ocamlopt
+CAMLOPTC:=$(CAMLBIN)ocamlopt -rectypes -c
+CAMLLINK:=$(CAMLBIN)ocamlc -rectypes
+CAMLOPTLINK:=$(CAMLBIN)ocamlopt -rectypes
 GRAMMARS:=grammar.cma
 CAMLP4EXTEND:=pa_extend.cmo pa_macro.cmo q_MLast.cmo
-PP:=-pp "$(CAMLBIN)$(CAMLP4)o -I . -I $(COQTOP)/parsing $(CAMLP4EXTEND) $(GRAMMARS) -impl"
+PP:=-pp "$(CAMLBIN)$(CAMLP4)o -I . -I $(COQSRC) $(CAMLP4EXTEND) $(GRAMMARS) -impl"
 
 ###################################
 #                                 #
@@ -209,7 +200,7 @@ Makefile: Make
 clean:
 	rm -f *.cmo *.cmi *.cmx *.o $(VOFILES) $(VIFILES) $(GFILES) *~
 	rm -f all.ps all-gal.ps all.glob $(VFILES:.v=.glob) $(HTMLFILES) $(GHTMLFILES) $(VFILES:.v=.tex) $(VFILES:.v=.g.tex) $(VFILES:.v=.v.d)
-	rm -f $(CMOFILES) $(MLFILES:.ml=.ml.d)
+	rm -f $(CMOFILES) $(MLFILES:.ml=.cmi) $(MLFILES:.ml=.ml.d)
 	- rm -rf html
 	- rm -f llex.cmo
 	- rm -f parse_little.cmo
