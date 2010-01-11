@@ -178,10 +178,10 @@ Qed.
 
 Lemma thinner_trans : forall v1 v2 v3, thinner v1 v2 ->
  thinner v2 v3 -> thinner v1 v3.
-unfold thinner; intros [bx ux] [by uy] [bz uz] [H1 H2] [H3 H4].
+unfold thinner; intros [b1 u1] [b2 u2] [b3 u3] [H1 H2] [H3 H4].
 split.
-rewrite cp_min_comm; apply cp_min_trans with by; rewrite cp_min_comm; auto.
-rewrite cp_max_comm; apply cp_max_trans with uy; rewrite cp_max_comm; auto.
+rewrite cp_min_comm; apply cp_min_trans with b2; rewrite cp_min_comm; auto.
+rewrite cp_max_comm; apply cp_max_trans with u2; rewrite cp_max_comm; auto.
 Qed.
 
 Lemma thinner_bot : forall v, thinner v bot.
