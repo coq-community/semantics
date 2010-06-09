@@ -187,7 +187,7 @@ Definition bind2 (A B C:Type)(v:option(A*B))
 Implicit Arguments bind2.
 
 Definition eq_skip (i:instr) : {i=skip}+{i<>skip}.
-intros i; case i; auto; right; discriminate.
+case i; auto; right; discriminate.
 Defined.
 
 Fixpoint f_sos (r:env)(i:instr) {struct i} : option (env*instr) :=
