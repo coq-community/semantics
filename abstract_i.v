@@ -469,7 +469,7 @@ destruct a2 as [ x | n2 | e2 e2'].
 eapply ict2; auto; intros; discriminate.
 eapply ict3; auto; intros; discriminate.
 eapply ict3; auto; intros; discriminate.
-Qed.
+Defined.
 
 Lemma l_subst_app : forall l1 l2 x e',
   l_subst (l1++l2) x e' = l_subst l1 x e' ++ l_subst l2 x e'.
