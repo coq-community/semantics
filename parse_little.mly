@@ -40,7 +40,7 @@ let rec mk_precs l i =
 main : VARIABLES environment IN inst END { ($2, $4) }
 ;
 main_intervals : VARIABLES interval_environment IN inst END  { ($2,$4) }
-num : NUM { z_of_big_int $1 } | MINUS NUM {Interp.zopp (z_of_big_int $2)}
+num : NUM { z_of_big_int $1 } | MINUS NUM {Interp.Z.opp (z_of_big_int $2)}
 ;
 identifier : ID { $1 }
 ;

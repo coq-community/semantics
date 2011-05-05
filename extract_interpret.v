@@ -12,4 +12,4 @@ Extract Constant constructive_indefinite_description =>
 
 (* Zopp is used in the parser. *)
 
-Extraction "interp.ml" Zopp denot.denot ax ab.
+Extraction "interp.ml" Z.opp denot.denot ax ab.
