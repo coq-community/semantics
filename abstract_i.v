@@ -780,9 +780,8 @@ injection Heq; intro; subst e'; apply compatible_trans with e1; auto.
 discriminate Heq.
 intros; discriminate.
 destruct (intersect_env true e b).
-case_eq (fp e b i (abstract_i i)); intros i' [l'' | ] Hfp Heq.
-injection Heq.
-intros Hi; apply compatible_trans with l''.
+case_eq (fp e b i (abstract_i i)); intros i' [l'' | ] Hfp Hi.
+apply compatible_trans with l''.
 apply fp_compatible with (2:= Hfp).
 exact IHi.
 apply compatible_intersect_env with false b; auto.
