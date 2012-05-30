@@ -1,8 +1,6 @@
 interp.ml
 interp.mli
-little
-llex.ml
-parse_little.ml
-parse_little.mli
+little.native
 proof_sqrt.v
 test_vcg.lil
+_build
