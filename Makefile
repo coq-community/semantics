@@ -22,6 +22,8 @@
 # 
 # This Makefile may take arguments passed as environment variables:
 # COQBIN to specify the directory where Coq binaries resides;
+# TIMECMD set a command to log .v compilation time;
+# TIMED if non empty, use the default time command as TIMECMD;
 # ZDEBUG/COQDEBUG to specify debug flags for ocamlc&ocamlopt/coqc;
 # DSTROOT to specify a prefix to install path.
 
@@ -30,8 +32,13 @@ define donewline
 
 
 endef
-includecmdwithout@ = $(eval $(subst @,$(donewline),$(shell { $(1) | tr '\n' '@'; })))
+includecmdwithout@ = $(eval $(subst @,$(donewline),$(shell { $(1) | tr -d '\r' | tr '\n' '@'; })))
 $(call includecmdwithout@,$(COQBIN)coqtop -config)
+
+TIMED=
+TIMECMD=
+STDTIME?=/usr/bin/time -f "$* (user: %U mem: %M ko)"
+TIMER=$(if $(TIMED), $(STDTIME), $(TIMECMD))
 
 ##########################
 #                        #
@@ -51,14 +58,15 @@ COQDOCLIBS?=-R . Semantics
 LITTLEDEPS=extract_interpret.vo parse_little.mly llex.mll str_little.ml little.ml
 
 OPT?=
-COQDEP?=$(COQBIN)coqdep -c
+COQDEP?="$(COQBIN)coqdep" -c
 COQFLAGS?=-q $(OPT) $(COQLIBS) $(OTHERFLAGS) $(COQ_XML)
 COQCHKFLAGS?=-silent -o
 COQDOCFLAGS?=-interpolate -utf8
-COQC?=$(COQBIN)coqc
-GALLINA?=$(COQBIN)gallina
-COQDOC?=$(COQBIN)coqdoc
-COQCHK?=$(COQBIN)coqchk
+COQC?=$(TIMER) "$(COQBIN)coqc"
+GALLINA?="$(COQBIN)gallina"
+COQDOC?="$(COQBIN)coqdoc"
+COQCHK?="$(COQBIN)coqchk"
+COQMKTOP?="$(COQBIN)coqmktop"
 
 ##################
 #                #
@@ -67,12 +75,12 @@ COQCHK?=$(COQBIN)coqchk
 ##################
 
 ifdef USERINSTALL
-XDG_DATA_HOME?=$(HOME)/.local/share
+XDG_DATA_HOME?="$(HOME)/.local/share"
 COQLIBINSTALL=$(XDG_DATA_HOME)/coq
 COQDOCINSTALL=$(XDG_DATA_HOME)/doc/coq
 else
-COQLIBINSTALL=${COQLIB}user-contrib
-COQDOCINSTALL=${DOCDIR}user-contrib
+COQLIBINSTALL="${COQLIB}user-contrib"
+COQDOCINSTALL="${DOCDIR}user-contrib"
 endif
 
 ######################
@@ -106,6 +114,11 @@ VIFILES:=$(VFILES:.v=.vi)
 GFILES:=$(VFILES:.v=.g)
 HTMLFILES:=$(VFILES:.v=.html)
 GHTMLFILES:=$(VFILES:.v=.g.html)
+ifeq '$(HASNATDYNLINK)' 'true'
+HASNATDYNLINK_OR_EMPTY := yes
+else
+HASNATDYNLINK_OR_EMPTY :=
+endif
 
 #######################################
 #                                     #
@@ -150,7 +163,7 @@ beautify: $(VFILES:=.beautified)
 	@echo 'Do not do "make clean" until you are sure that everything went well!'
 	@echo 'If there were a problem, execute "for file in $$(find . -name \*.v.old -print); do mv $${file} $${file%.old}; done" in your shell/'
 
-.PHONY: all opt byte archclean clean install userinstall depend html validate
+.PHONY: all opt byte archclean clean install uninstall_me.sh uninstall userinstall depend html validate
 
 ###################
 #                 #
@@ -181,7 +194,7 @@ proof_sqrt.v: context_sqrt.v tail_sqrt.v sqrt.lil little.native
 	./little.native -vcg-coq < sqrt.lil | cat context_sqrt.v - tail_sqrt.v > proof_sqrt.v
 
 little.native: $(LITTLEDEPS)
-	$(CAMLBIN)ocamlbuild -classic-display -libs nums $@
+	$(CAMLBIN)ocamlbuild -no-hygiene -classic-display -libs nums $@
 
 ####################
 #                  #
@@ -199,21 +212,32 @@ userinstall:
 	+$(MAKE) USERINSTALL=true install
 
 install:
-	for i in $(VOFILES); do \
-	 install -d `dirname $(DSTROOT)$(COQLIBINSTALL)/Semantics/$$i`; \
-	 install -m 0644 $$i $(DSTROOT)$(COQLIBINSTALL)/Semantics/$$i; \
+	cd "." && for i in $(VOFILES) $(CMOFILES) $(CMIFILES) $(CMAFILES); do \
+	 install -d "`dirname "$(DSTROOT)"$(COQLIBINSTALL)/Semantics/$$i`"; \
+	 install -m 0644 $$i "$(DSTROOT)"$(COQLIBINSTALL)/Semantics/$$i; \
 	done
 
 install-doc:
-	install -d $(DSTROOT)$(COQDOCINSTALL)/Semantics/html
+	install -d "$(DSTROOT)"$(COQDOCINSTALL)/Semantics/html
 	for i in html/*; do \
-	 install -m 0644 $$i $(DSTROOT)$(COQDOCINSTALL)/Semantics/$$i;\
+	 install -m 0644 $$i "$(DSTROOT)"$(COQDOCINSTALL)/Semantics/$$i;\
 	done
+
+uninstall_me.sh:
+	echo '#!/bin/sh' > $@ 
+	printf 'cd "$${DSTROOT}"$(COQLIBINSTALL)/Semantics && rm -f $(VOFILES) $(CMOFILES) $(CMIFILES) $(CMAFILES) && find . -type d -and -empty -delete\ncd "$${DSTROOT}"$(COQLIBINSTALL) && find "Semantics" -maxdepth 0 -and -empty -exec rmdir -p \{\} \;\n' >> "$@"
+	printf 'cd "$${DSTROOT}"$(COQDOCINSTALL)/Semantics \\\n' >> "$@"
+	printf '&& rm -f $(shell find "html" -maxdepth 1 -and -type f -print)\n' >> "$@"
+	printf 'cd "$${DSTROOT}"$(COQDOCINSTALL) && find Semantics/html -maxdepth 0 -and -empty -exec rmdir -p \{\} \;\n' >> "$@"
+	chmod +x $@
+
+uninstall: uninstall_me.sh
+	sh $<
 
 clean:
 	rm -f $(VOFILES) $(VIFILES) $(GFILES) $(VFILES:.v=.v.d) $(VFILES:=.beautified) $(VFILES:=.old)
 	rm -f all.ps all-gal.ps all.pdf all-gal.pdf all.glob $(VFILES:.v=.glob) $(VFILES:.v=.tex) $(VFILES:.v=.g.tex) all-mli.tex
-	- rm -rf html mlihtml
+	- rm -rf html mlihtml uninstall_me.sh
 	- rm -rf 
 	- rm -rf test_vcg.lil
 	- rm -rf proof_sqrt.v
@@ -223,17 +247,17 @@ archclean:
 	rm -f *.cmx *.o
 
 printenv:
-	@$(COQBIN)coqtop -config
-	@echo CAMLC =	$(CAMLC)
-	@echo CAMLOPTC =	$(CAMLOPTC)
-	@echo PP =	$(PP)
-	@echo COQFLAGS =	$(COQFLAGS)
-	@echo COQLIBINSTALL =	$(COQLIBINSTALL)
-	@echo COQDOCINSTALL =	$(COQDOCINSTALL)
+	@"$(COQBIN)coqtop" -config
+	@echo 'CAMLC =	$(CAMLC)'
+	@echo 'CAMLOPTC =	$(CAMLOPTC)'
+	@echo 'PP =	$(PP)'
+	@echo 'COQFLAGS =	$(COQFLAGS)'
+	@echo 'COQLIBINSTALL =	$(COQLIBINSTALL)'
+	@echo 'COQDOCINSTALL =	$(COQDOCINSTALL)'
 
 Makefile: Make
 	mv -f $@ $@.bak
-	$(COQBIN)coq_makefile -f $< -o $@
+	"$(COQBIN)coq_makefile" -f $< -o $@
 
 
 ###################
@@ -261,7 +285,7 @@ Makefile: Make
 	$(COQDOC) $(COQDOCFLAGS) -latex -g $< -o $@
 
 %.g.html: %.v %.glob
-	$(COQDOC)$(COQDOCFLAGS)  -html -g $< -o $@
+	$(COQDOC) $(COQDOCFLAGS)  -html -g $< -o $@
 
 %.v.d: %.v
 	$(COQDEP) -slash $(COQLIBS) "$<" > "$@" || ( RV=$$?; rm -f "$@"; exit $${RV} )
