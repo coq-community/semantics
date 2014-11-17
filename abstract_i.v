@@ -1256,7 +1256,6 @@ apply thinner_eval; auto.
 apply thinner_lookup; auto.
 intros; discriminate.
 rewrite Hi; intros Heq'; injection Heq'; intros Heq; clear Heq'.
-simpl l.
 subst l1.
 rewrite Hi.
 exists l'; auto.
@@ -1311,7 +1310,6 @@ apply thinner_eval; auto.
 apply thinner_lookup; auto.
 intros; discriminate.
 rewrite Hi; intros Heq'; injection Heq'; intros Heq; clear Heq'.
-simpl l.
 subst l1.
 rewrite Hi.
 exists l'; auto.
