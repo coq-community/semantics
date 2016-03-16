@@ -1,4 +1,5 @@
 -R . Semantics
+
 abstract_i.v
 axiom.v
 constructs.v
@@ -14,7 +15,9 @@ little.v
 little_w_string.v
 parser.v
 syntax.v
+
 LITTLEDEPS = "extract_interpret.vo parse_little.mly llex.mll str_little.ml little.ml"
+
 -extra "little.native" "$(LITTLEDEPS)" "$(CAMLBIN)ocamlbuild -no-hygiene -classic-display -libs nums $@"
 -extra proof_sqrt.v
 	"context_sqrt.v tail_sqrt.v sqrt.lil little.native"
