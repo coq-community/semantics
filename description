@@ -7,7 +7,7 @@ Email: Yves.Bertot@sophia.inria.fr
 Homepage: http://www-sop.inria.fr/marelle/Yves.Bertot
 Institution: INRIA Sophia Antipolis
 Address:
-Date: July 5, 2007
+Date: 2007-07-5
 Description: This is a survey of programming language semantics styles
 for a miniature example of a programming language, with their encoding
 in Coq, the proofs of equivalence of different styles, and the proof
