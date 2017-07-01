@@ -2,6 +2,7 @@ Require Export little.
 Require Export denot.
 Require Export axiom.
 Require Export abstract_i.
+Require Extraction.
 
 Extract Constant Tarski_fix => "let rec fix f = f (fun y -> fix f y) in fix".
 
