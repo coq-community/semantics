@@ -19,8 +19,8 @@ parameterized by a module type of strings.  A hand-written parser is
 also provided in Coq, but there are no proofs associated.
 Url: ftp://ftp-sop.inria.fr/marelle/Yves.Bertot/semantics_survey.tgz
 License: LGPL
-Keywords: natural semantics, denotational semantics, axiomatic
-semantics, Hoare logic, Dijkstra weakest pre-condition calculus,
+Keywords: natural semantics, denotational semantics, 
+axiomatic semantics, Hoare logic, Dijkstra weakest pre-condition calculus,
 abstract interpretation, intervals
 Require:
 Category: Computer Science/Semantics and Compilation/Semantics
