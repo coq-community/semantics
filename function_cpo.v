@@ -4,9 +4,9 @@ Require Export List ZArith.
 
 (* SECTION: Proving Tarski's fixpoint theorem. *)
 
-Implicit Arguments antisymmetric.
-Implicit Arguments transitive.
-Implicit Arguments reflexive.
+Arguments antisymmetric : default implicits.
+Arguments transitive : default implicits.
+Arguments reflexive : default implicits.
 
 Section cpos.
 Variables (A:Type)(R:A->A->Prop).
@@ -47,10 +47,10 @@ Definition complete :=
   forall f:nat->A, chain f -> exists x: A, lub x f.
 
 End cpos.
-Implicit Arguments upper_bound.
-Implicit Arguments lub.
-Implicit Arguments chain.
-Implicit Arguments complete.
+Arguments upper_bound : default implicits.
+Arguments lub : default implicits.
+Arguments chain : default implicits.
+Arguments complete : default implicits.
 
 Section continuity.
 
@@ -95,8 +95,8 @@ apply (unique_lub B R' (fun n => f (c n))); assumption.
 Qed.
 
 End continuity.
-Implicit Arguments monotonic.
-Implicit Arguments continuous.
+Arguments monotonic : default implicits.
+Arguments continuous : default implicits.
 
 Section Tarski_theory.
 
@@ -179,7 +179,7 @@ apply phi_less_than_fixpoint; auto.
 Qed.
 
 End Tarski_theory.
-Implicit Arguments least_fixpoint.
+Arguments least_fixpoint : default implicits.
 
 (* SECTION: basic properties of the basic discrete order. *)
 
@@ -246,7 +246,7 @@ intros n Hneq; exists (f n); split; [auto | intros y; auto].
 Qed.
 End opt_cpo.
 Hint Resolve option_cpo_refl option_cpo_none_bot reflexive_option_cpo.
-Implicit Arguments option_cpo.
+Arguments option_cpo : default implicits.
 
 (* SECTION: providing usable mathematical tools for a classical setting. *)
 
@@ -277,9 +277,9 @@ Qed.
 
 End pointwise_update_function.
 
-Implicit Arguments p_v.
-Implicit Arguments pointwise_variant_eq.
-Implicit Arguments pointwise_variant_diff.
+Arguments p_v : default implicits.
+Arguments pointwise_variant_eq : default implicits.
+Arguments pointwise_variant_diff : default implicits.
 
 Section lift.
 
@@ -374,7 +374,7 @@ Definition Tarski_fix
   (epsilon (inhabits (fun x => None))
               (fun phi => least_fixpoint (f_order A B) f phi)).
 
-Implicit Arguments Tarski_fix [A B].
+Arguments Tarski_fix [A B].
 
 Theorem Tarski_fix_prop :
     forall (A B:Type) (f : (A -> option B)->A -> option B),

@@ -589,7 +589,7 @@ Inductive compatible (A:Type) : list(string*A)->list(string*A) -> Prop :=
 | cc2 : forall s a1 a2 tl1 tl2, compatible A tl1 tl2 -> 
      compatible A ((s,a1)::tl1)((s,a2)::tl2).
 
-Implicit Arguments compatible.
+Arguments compatible : default implicits.
 
 Lemma thinner_compatible :
    forall l1 l2, thinner_env l1 l2 -> compatible l1 l2.
@@ -953,7 +953,7 @@ Qed.
 Definition fpw (A:Type)(g:string->A)(s:string)(v:A)(s1:string) :=
   if string_dec s s1 then v else g s1.
 
-Implicit Arguments fpw.
+Arguments fpw : default implicits.
 
 Lemma subst_fpw :
   forall g s e' e, af' g (subst e s e') = af' (fpw g s (af' g e')) e.
