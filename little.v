@@ -316,7 +316,7 @@ Proof with eauto.
   intros v1 Heq1 v2 Heq2 Heq; injection Heq; intros; subst...
 Qed.
 
-Hint Resolve af_eval Zge_le.
+Hint Resolve af_eval Z.ge_le.
 
 Lemma bf_eval :
   forall r e v, bf r e = Some v -> beval r e v.
