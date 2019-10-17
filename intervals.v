@@ -1,5 +1,4 @@
 Require Import ZArith List.
-Unset Standard Proposition Elimination Names.
 Open Scope Z_scope.
 Open Scope list_scope.
 
