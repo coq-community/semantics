@@ -193,7 +193,7 @@ Inductive option_cpo : option A -> option A -> Prop :=
 Lemma reflexive_option_cpo : reflexive option_cpo.
 Proof option_cpo_refl.
 
-Hint Resolve option_cpo_refl option_cpo_none_bot reflexive_option_cpo.
+Hint Resolve option_cpo_refl option_cpo_none_bot reflexive_option_cpo : core.
 
 Lemma antisym_option_cpo : antisymmetric option_cpo.
 intros x y H; inversion H.
@@ -211,7 +211,7 @@ Lemma transitive_option_cpo :  transitive option_cpo.
 intros x y z H1 H2 ; apply transitive_option_cpo_aux with y ; assumption.
 Qed.
 
-Hint Resolve transitive_option_cpo.
+Hint Resolve transitive_option_cpo : core.
 
 Lemma chain_none_pred :
   forall f n p, chain option_cpo f ->
@@ -233,7 +233,7 @@ inversion Hcpo; [elim Hneq; auto | auto].
 apply chain_le; auto with arith.
 Qed.
 
-Hint Resolve value_upper_bound.
+Hint Resolve value_upper_bound : core.
 Theorem complete_option_cpo : complete option_cpo.
 intros f Hchain.
 elim (classic (forall n, f n = None)).
@@ -245,7 +245,7 @@ elim not_all_ex_not with
 intros n Hneq; exists (f n); split; [auto | intros y; auto].
 Qed.
 End opt_cpo.
-Hint Resolve option_cpo_refl option_cpo_none_bot reflexive_option_cpo.
+Hint Resolve option_cpo_refl option_cpo_none_bot reflexive_option_cpo : core.
 Arguments option_cpo : default implicits.
 
 (* SECTION: providing usable mathematical tools for a classical setting. *)
@@ -492,4 +492,4 @@ intros; unfold f_order'; apply complete_f_order.
 Qed.
 
 Hint Resolve reflexive_f_order' antisymmetric_f_order' transitive_f_order'
-  complete_f_order'.
+  complete_f_order' : core.
