@@ -1,5 +1,4 @@
 Require Import ZArith List.
-Unset Standard Proposition Elimination Names.
 Open Scope Z_scope.
 Open Scope list_scope.
 
@@ -25,7 +24,7 @@ Definition of_int (x:Z) := (cZ x, cZ x).
 Definition cp_min (n1 n2:ext_Z) : ext_Z :=
   match n1, n2 with
     minfty, a => minfty
-  | cZ n1, cZ n2 => cZ (Zmin n1 n2)
+  | cZ n1, cZ n2 => cZ (Z.min n1 n2)
   | a, minfty => minfty
   | a, pinfty => a
   | pinfty, a => a
@@ -35,21 +34,21 @@ Definition cp_min (n1 n2:ext_Z) : ext_Z :=
 Definition cp_max (n1 n2:ext_Z) : ext_Z :=
   match n1, n2 with
     minfty, a => a
-  | cZ n1, cZ n2 => cZ (Zmax n1 n2)
+  | cZ n1, cZ n2 => cZ (Z.max n1 n2)
   | a, minfty => a
   | pinfty, a => pinfty
   | a, pinfty => pinfty
   end.
 
-Lemma Zle_to_Zmin : forall n m, n <= m -> Zmin n m = n.
-intros n n'; unfold Zmin, Zle.
+Lemma Zle_to_Zmin : forall n m, n <= m -> Z.min n m = n.
+intros n n'; unfold Z.min, Z.le.
 case (n?=n'); intuition.
 Qed.
 
-Lemma Zle_to_Zmax : forall n m, m <= n -> Zmax n m = n.
-intros n n'; unfold Zmax.
+Lemma Zle_to_Zmax : forall n m, m <= n -> Z.max n m = n.
+intros n n'; unfold Z.max.
 intros Hle; cut (n >= n').
-unfold Zge.
+unfold Z.ge.
 case_eq (n ?= n'); intros Heq H; try (elim H; auto; fail).
 rewrite Zcompare_Eq_eq with (1:=Heq); auto.
 auto.
@@ -59,20 +58,20 @@ Qed.
 Lemma cp_min_assoc :
   forall a b c, cp_min (cp_min a b) c = cp_min a (cp_min b c).
 intros [a | | ]; simpl; auto; intros [b | |]; simpl; auto; intros [c| |]; simpl; auto.
-rewrite Zmin_assoc; auto.
+rewrite Z.min_assoc; auto.
 Qed.
 
 Lemma cp_max_assoc :
   forall a b c, cp_max (cp_max a b) c = cp_max a (cp_max b c).
 intros [a | | ]; simpl; auto; intros [b | |]; simpl; auto; intros [c| |]; simpl; auto.
-rewrite Zmax_assoc; auto.
+rewrite Z.max_assoc; auto.
 Qed.
 
 Lemma cp_max_r_cp_min_l :
   forall a b, cp_max a b = b -> cp_min a b = a.
 intros [a | | ][b | | ]; simpl; auto.
 intros H; injection H; intros H1.
-assert (a <= b) by (rewrite <- H1; apply Zle_max_l).
+assert (a <= b) by (rewrite <- H1; apply Z.le_max_l).
 rewrite Zle_to_Zmin; auto.
 Qed.
 
@@ -80,7 +79,7 @@ Lemma cp_min_r_cp_max_l :
   forall a b, cp_min a b = b -> cp_max a b = a.
 intros [a | | ][b | | ]; simpl; auto.
 intros H; injection H; intros H1.
-assert (b <= a) by (rewrite <- H1; apply Zle_min_l).
+assert (b <= a) by (rewrite <- H1; apply Z.le_min_l).
 rewrite Zle_to_Zmax; auto.
 Qed.
 
@@ -90,7 +89,7 @@ Definition join (i1 i2:ext_Z*ext_Z) : ext_Z*ext_Z :=
 Definition ext_eq : forall a b:ext_Z, {a=b}+{a<>b}.
 intros a b; destruct a as [na | | ]; destruct b as [nb | | ];
 try (left; apply refl_equal); try (right; discriminate).
-case (Z_eq_dec na nb); intros Heq; (left; rewrite Heq; apply refl_equal) ||
+case (Z.eq_dec na nb); intros Heq; (left; rewrite Heq; apply refl_equal) ||
  (right; intros H'; elim Heq; injection H'; auto).
 Defined.
 
@@ -140,14 +139,14 @@ Definition thinner (i j : ext_Z*ext_Z) : Prop :=
 
 Lemma cp_min_comm : forall i j, cp_min i j = cp_min j i.
 intros [ni | | ] [nj | | ];simpl; auto.
-rewrite Zmin_comm; auto.
+rewrite Z.min_comm; auto.
 Qed.
 
 Lemma cp_max_comm :
    forall x y, cp_max x y = cp_max y x.
 Proof.
 intros [x | | ] [y | | ]; simpl; auto.
-rewrite Zmax_comm; auto.
+rewrite Z.max_comm; auto.
 Qed.
 
 Lemma thinner_refl : forall v, thinner v v.
@@ -161,7 +160,7 @@ intros [x | | ] [y| |]; try (simpl; intros; discriminate);
 intros [z | | ]; try(simpl; intros; discriminate); simpl; auto.
 intros H1 H2; injection H1; injection H2; intros H3 H4.
 rewrite Zle_to_Zmin; auto.
-apply Zle_trans with y.
+apply Z.le_trans with y.
 rewrite <-H4; auto with zarith.
 rewrite <- H3; auto with zarith.
 Qed.
@@ -172,9 +171,9 @@ intros [x | | ] [y| |]; try (simpl; intros; discriminate);
 intros [z | | ]; try(simpl; intros; discriminate); simpl; auto.
 intros H1 H2; injection H1; injection H2; intros H3 H4.
 rewrite Zle_to_Zmax; auto.
-apply Zle_trans with y.
-rewrite <- H3; apply Zle_max_r.
-rewrite <-H4; apply Zle_max_r.
+apply Z.le_trans with y.
+rewrite <- H3; apply Z.le_max_r.
+rewrite <-H4; apply Z.le_max_r.
 Qed.
 
 Lemma thinner_trans : forall v1 v2 v3, thinner v1 v2 ->
@@ -197,9 +196,9 @@ intros [x | | ] [y | | ];simpl;try (intros;discriminate);
 intros [z | | ] [t' | | ];simpl; try (intros; discriminate); auto.
 intros H1 H2; injection H1; injection H2; intros H4 H3.
 apply f_equal with (f:=cZ); apply Zle_to_Zmin.
-apply Zle_trans with (x + t').
-apply Zplus_le_compat_l; rewrite <- H4; apply Zle_min_r.
-apply Zplus_le_compat_r; rewrite <- H3; apply Zle_min_r.
+apply Z.le_trans with (x + t').
+apply Zplus_le_compat_l; rewrite <- H4; apply Z.le_min_r.
+apply Zplus_le_compat_r; rewrite <- H3; apply Z.le_min_r.
 Qed.
 
 Lemma cp_max_plus :
@@ -210,9 +209,9 @@ intros [x | | ] [y | | ];simpl;try (intros;discriminate);
 intros [z | | ] [t' | | ];simpl; try (intros; discriminate); auto.
 intros H1 H2; injection H1; injection H2; intros H4 H3.
 apply f_equal with (f:=cZ); apply Zle_to_Zmax.
-apply Zle_trans with (x + t').
-apply Zplus_le_compat_r; rewrite <- H3; apply Zle_max_r.
-apply Zplus_le_compat_l; rewrite <- H4; apply Zle_max_r.
+apply Z.le_trans with (x + t').
+apply Zplus_le_compat_r; rewrite <- H3; apply Z.le_max_r.
+apply Zplus_le_compat_l; rewrite <- H4; apply Z.le_max_r.
 Qed.
 
 Lemma thinner_plus :
@@ -224,13 +223,13 @@ rewrite cp_max_comm; apply cp_max_plus; rewrite cp_max_comm; auto.
 Qed.
 
 Lemma cp_max_refl : forall x, cp_max x x = x.
-intros [x | | ]; simpl; unfold Zmax; auto.
-rewrite Zcompare_refl; auto.
+intros [x | | ]; simpl; unfold Z.max; auto.
+rewrite Z.compare_refl; auto.
 Qed.
 
 Lemma cp_min_refl : forall x, cp_min x x = x.
-intros [x | | ]; simpl; unfold Zmin; auto.
-rewrite Zcompare_refl; auto.
+intros [x | | ]; simpl; unfold Z.min; auto.
+rewrite Z.compare_refl; auto.
 Qed.
 
 Lemma eq_sound : forall x y, eq x y = true -> x = y.
@@ -241,7 +240,7 @@ Qed.
 
 Lemma eq_complete : forall x, eq x x = true.
 intros [[l | |][u| |]]; simpl; auto; 
-try case (Z_eq_dec l l); try case (Z_eq_dec u u); intros; auto;
+try case (Z.eq_dec l l); try case (Z.eq_dec u u); intros; auto;
 try match goal with id :~_ |- _ => case id; apply refl_equal end.
 Qed.
 
@@ -258,32 +257,32 @@ destruct l1 as [l1 | | ]; destruct  l2 as [l2 | | ];
  simpl in H1, H2, H3, H4 |- *; try discriminate; auto;
 destruct l3 as [l3 | | ]; simpl in H1, H2, H3, H4 |- *; try discriminate; auto;
 destruct l4 as [l4 | | ]; simpl in H1, H2, H3, H4 |- *; try discriminate; auto.
-rewrite Zmin_assoc; rewrite <- (Zmin_assoc l1 l3 l2); rewrite (Zmin_comm l3 l2).
+rewrite Z.min_assoc; rewrite <- (Z.min_assoc l1 l3 l2); rewrite (Z.min_comm l3 l2).
 injection H1; injection H3; clear H1 H3; intros H3 H1.
-rewrite Zmin_assoc; rewrite H1; rewrite <- Zmin_assoc; rewrite H3; auto.
-injection H1; clear H1; intros H1; rewrite Zmin_assoc; rewrite H1; auto.
-injection H3; clear H3; intros H3; rewrite Zmin_assoc; rewrite (Zmin_comm l3).
-rewrite <- Zmin_assoc; rewrite H3; auto.
+rewrite Z.min_assoc; rewrite H1; rewrite <- Z.min_assoc; rewrite H3; auto.
+injection H1; clear H1; intros H1; rewrite Z.min_assoc; rewrite H1; auto.
+injection H3; clear H3; intros H3; rewrite Z.min_assoc; rewrite (Z.min_comm l3).
+rewrite <- Z.min_assoc; rewrite H3; auto.
 
 destruct u1 as [u1 | | ]; destruct  u2 as [u2 | | ];
  simpl in H1, H2, H3, H4 |- *; try discriminate; auto;
 destruct u3 as [u3 | | ]; simpl in H1, H2, H3, H4 |- *; try discriminate; auto;
 destruct u4 as [u4 | | ]; simpl in H1, H2, H3, H4 |- *; try discriminate; auto.
 injection H2; injection H4; clear H2 H4; intros H4 H2.
-rewrite Zmax_assoc; rewrite <- (Zmax_assoc u1); rewrite (Zmax_comm u3).
-rewrite Zmax_assoc; rewrite H2; rewrite <- Zmax_assoc; rewrite H4; auto.
-injection H2; clear H2; intros H2; rewrite Zmax_assoc; rewrite H2; auto.
-injection H4; clear H4; intros H4; rewrite Zmax_assoc; rewrite (Zmax_comm u3).
-rewrite <- Zmax_assoc; rewrite H4; auto.
+rewrite Z.max_assoc; rewrite <- (Z.max_assoc u1); rewrite (Z.max_comm u3).
+rewrite Z.max_assoc; rewrite H2; rewrite <- Z.max_assoc; rewrite H4; auto.
+injection H2; clear H2; intros H2; rewrite Z.max_assoc; rewrite H2; auto.
+injection H4; clear H4; intros H4; rewrite Z.max_assoc; rewrite (Z.max_comm u3).
+rewrite <- Z.max_assoc; rewrite H4; auto.
 Qed.
 
 Lemma thinner_join_left :  forall i i', thinner i (join i i').
 intros [b1 u1] [b2 u2]; split.
 destruct b1 as [l | | ]; destruct b2 as [l' | | ]; simpl; auto.
-rewrite Zmin_assoc; rewrite Zmin_idempotent; auto.
+rewrite Z.min_assoc; rewrite Zmin_idempotent; auto.
 rewrite Zmin_idempotent; auto.
 destruct u1 as [l | | ]; destruct u2 as [l' | | ]; simpl; auto.
-rewrite Zmax_assoc; rewrite Zmax_idempotent; auto.
+rewrite Z.max_assoc; rewrite Zmax_idempotent; auto.
 rewrite Zmax_idempotent; auto.
 Qed.
 
@@ -302,26 +301,26 @@ intros [l u]; unfold join; rewrite cp_min_refl; rewrite cp_max_refl; auto.
 Qed.
 
 Ltac Zmin_max_to_le :=
- match goal with id : cZ (Zmin ?a ?b) = cZ ?a |- _ =>
+ match goal with id : cZ (Z.min ?a ?b) = cZ ?a |- _ =>
   assert (Dummy := id); clear id;
   assert (id : a <= b) by
     (injection Dummy; clear Dummy; intros Dummy; rewrite <- Dummy;
-     apply Zle_min_r); clear Dummy
-| id : cZ (Zmin ?a ?b) = cZ ?b |- _ =>
+     apply Z.le_min_r); clear Dummy
+| id : cZ (Z.min ?a ?b) = cZ ?b |- _ =>
   assert (Dummy:= id); clear id;
   assert (id : b <= a) by
     (injection Dummy; clear Dummy; intros Dummy; rewrite <- Dummy;
-        apply Zle_min_l); clear Dummy
-| id : cZ (Zmax ?a ?b) = cZ ?a |- _ =>
+        apply Z.le_min_l); clear Dummy
+| id : cZ (Z.max ?a ?b) = cZ ?a |- _ =>
   assert (Dummy := id); clear id;
   assert (id : b <= a) by
     (injection Dummy; clear Dummy; intros Dummy; rewrite <- Dummy;
-     apply Zle_max_r); clear Dummy
-| id : cZ (Zmax ?a ?b) = cZ ?b |- _ =>
+     apply Z.le_max_r); clear Dummy
+| id : cZ (Z.max ?a ?b) = cZ ?b |- _ =>
   assert (Dummy:= id); clear id;
   assert (id : a <= b) by
     (injection Dummy; clear Dummy; intros Dummy; rewrite <- Dummy;
-        apply Zle_max_l); clear Dummy
+        apply Z.le_max_l); clear Dummy
  end.
 
 Ltac cp_max_min_diff :=
@@ -346,17 +345,17 @@ Ltac cp_max_min_diff :=
   end.
 
 Lemma Zmax_le_compat :
-  forall a b c d, a <= b -> c <= d -> Zmax a c <= Zmax b d.
-intros; apply Zmax_lub.
-apply Zle_trans with b; auto; apply Zle_max_l.
-apply Zle_trans with d; auto; apply Zle_max_r.
+  forall a b c d, a <= b -> c <= d -> Z.max a c <= Z.max b d.
+intros; apply Z.max_lub.
+apply Z.le_trans with b; auto; apply Z.le_max_l.
+apply Z.le_trans with d; auto; apply Z.le_max_r.
 Qed.
 
 Lemma Zmin_le_compat :
-  forall a b c d, a <= b -> c <= d -> Zmin a c <= Zmin b d.
-intros; apply Zmin_glb.
-apply Zle_trans with a; auto; apply Zle_min_l.
-apply Zle_trans with c; auto; apply Zle_min_r.
+  forall a b c d, a <= b -> c <= d -> Z.min a c <= Z.min b d.
+intros; apply Z.min_glb.
+apply Z.le_trans with a; auto; apply Z.le_min_l.
+apply Z.le_trans with c; auto; apply Z.le_min_r.
 Qed.
 
 Lemma thinner_widen : forall v1 v2, thinner v1 (widen v1 v2).
@@ -382,10 +381,10 @@ Lemma to_p_thinner : forall l u x, to_p (l,u) x ->
     thinner (l, cZ x) (l, u)/\ thinner (cZ x, u)(l,u).
 intros [l | |] [u | |] x ;unfold to_p, thinner; simpl; try(intuition;fail);
 repeat rewrite Zmin_idempotent; repeat rewrite Zmax_idempotent.
-intros; rewrite Zmax_comm; rewrite Zle_to_Zmax; try omega;
- rewrite Zmin_comm; rewrite Zle_to_Zmin; auto; omega.
-intros; rewrite Zmin_comm; rewrite Zle_to_Zmin; auto.
-intros; rewrite Zmax_comm; rewrite Zle_to_Zmax; auto.
+intros; rewrite Z.max_comm; rewrite Zle_to_Zmax; try omega;
+ rewrite Z.min_comm; rewrite Zle_to_Zmin; auto; omega.
+intros; rewrite Z.min_comm; rewrite Zle_to_Zmin; auto.
+intros; rewrite Z.max_comm; rewrite Zle_to_Zmax; auto.
 Qed.
 
 Lemma plus_correct :
@@ -406,9 +405,9 @@ Lemma to_p_cp_max_min :
    forall l u x, to_p (l,u) x -> cp_max l (cZ x) = cZ x /\ 
                   cp_min (cZ x) u = cZ x.
 intros [l | | ][u | | ]; unfold to_p; simpl; try(intuition; fail).
-intros; rewrite Zmax_comm; rewrite Zle_to_Zmax;try rewrite Zle_to_Zmin;
+intros; rewrite Z.max_comm; rewrite Zle_to_Zmax;try rewrite Zle_to_Zmin;
  intuition.
-intros; rewrite Zmax_comm; rewrite Zle_to_Zmax; intuition.
+intros; rewrite Z.max_comm; rewrite Zle_to_Zmax; intuition.
 intros; rewrite Zle_to_Zmin; intuition.
 Qed.
 
@@ -416,9 +415,9 @@ Lemma cp_max_min_to_p :
   forall l u x, cp_max l (cZ x) = cZ x -> cp_min (cZ x) u = cZ x-> to_p (l,u) x.
 intros [l | | ][u | | ]; unfold to_p; simpl; try(intros; auto; discriminate).
 intros x H1 H2; injection H1; injection H2; intros H3 H4;split;
- [rewrite <- H4; apply Zle_max_l | rewrite <- H3; apply Zle_min_r].
-intros x H1 _ ; injection H1; intros H3;rewrite <- H3; apply Zle_max_l.
-intros x _ H1; injection H1; intros H3; rewrite <- H3; apply Zle_min_r.
+ [rewrite <- H4; apply Z.le_max_l | rewrite <- H3; apply Z.le_min_r].
+intros x H1 _ ; injection H1; intros H3;rewrite <- H3; apply Z.le_max_l.
+intros x _ H1; injection H1; intros H3; rewrite <- H3; apply Z.le_min_r.
 Qed.
 
 Lemma thinner_prop :
@@ -446,7 +445,7 @@ intros [b1 u1] [b2 u2]; unfold add_test_constraint_right.
 case (ext_eq b1 (cp_max b1 u2)); intros Heq.
 intros _; destruct b1 as [b1 | | ]; destruct u2 as [u2 | | ];
 try (assert (H' : u2 <= b1) by(injection Heq; 
-            intros h; rewrite h; apply Zle_max_r));
+            intros h; rewrite h; apply Z.le_max_r));
  destruct u1 as [u1 | | ]; simpl in Heq;
  try discriminate heq; simpl; intros e1 e2 g; simpl;
   try(intuition;fail); try discriminate;
@@ -462,7 +461,7 @@ intros [b1 u1] [b2 u2]; unfold add_test_constraint_left.
 case (ext_eq b1 (cp_max b1 u2)); intros Heq.
 intros _; destruct b1 as [b1 | | ]; destruct u2 as [u2 | | ];
 try (assert (H' : u2 <= b1) by(injection Heq; 
-            intros h; rewrite h; apply Zle_max_r));
+            intros h; rewrite h; apply Z.le_max_r));
  destruct u1 as [u1 | | ]; simpl in Heq;
  try discriminate heq; simpl; intros e1 e2 g; simpl;
  try(intuition;fail); try discriminate;
@@ -470,7 +469,7 @@ destruct b2 as [b2 | | ]; simpl; try(intuition;fail).
 case (ext_eq u2 (cp_min b1 u2)).
 intros Heq' _;destruct b1 as [b1 | | ];destruct u2 as [u2 | | ]; simpl in Heq';
 try (assert (H' : u2 <= b1) by(injection Heq'; 
-            intros h; rewrite h; apply Zle_min_l));
+            intros h; rewrite h; apply Z.le_min_l));
  destruct u1 as [u1 | | ]; simpl in Heq;
  try discriminate heq; simpl; intros e1 e2 g;  simpl;
  try(intuition;fail); try discriminate;
@@ -487,7 +486,7 @@ case (ext_eq b2 (cp_max u1 b2)); intros Heq;
 case (ext_eq u1 (cp_max u1 b2)); intros Heq'; try (intros; discriminate).
 intros _; destruct b2 as [b2 | | ]; destruct u1 as [u1 | | ];
 try (assert (H' : u1 <= b2) by 
- (injection Heq; intros h; rewrite h; apply Zle_max_l));
+ (injection Heq; intros h; rewrite h; apply Z.le_max_l));
 try (assert (H'' : ~u1 = b2)
   by (intros h; subst u1; elim Heq'; rewrite cp_max_refl; auto));
   simpl; try (intuition; fail);
@@ -506,7 +505,7 @@ case (ext_eq b2 (cp_max u1 b2)); intros Heq;
 case (ext_eq u1 (cp_max u1 b2)); intros Heq'; try (intros; discriminate).
 intros _; destruct b2 as [b2 | | ]; destruct u1 as [u1 | | ];
 try (assert (H' : u1 <= b2) by 
- (injection Heq; intros h; rewrite h; apply Zle_max_l));
+ (injection Heq; intros h; rewrite h; apply Z.le_max_l));
 try (assert (H'' : ~u1 = b2)
   by (intros h; subst u1; elim Heq'; rewrite cp_max_refl; auto));
   simpl; try (intuition; fail);
@@ -531,16 +530,16 @@ destruct u1 as [u1 | | ]; try (simpl; intuition;fail);
 destruct u2 as [u2 | | ]; try (simpl; intuition; fail); simpl;
  try (intros; discriminate).
 assert (x1 <= u1) by (simpl in H4; injection H4; intros H7; rewrite <- H7;
-                      apply Zle_min_r).
+                      apply Z.le_min_r).
 assert (x2 <= u2) by (simpl in H6; injection H6; intros H7; rewrite <- H7;
-                      apply Zle_min_r).
+                      apply Z.le_min_r).
 destruct (Zle_or_lt u1 (u2+ -1)).
 rewrite (Zle_to_Zmin u1); try omega.
 rewrite Zle_to_Zmin; auto.
-rewrite (Zmin_comm u1); rewrite (Zle_to_Zmin (u2+ -1)); try omega.
+rewrite (Z.min_comm u1); rewrite (Zle_to_Zmin (u2+ -1)); try omega.
 rewrite Zle_to_Zmin; auto; omega.
 assert (x2 <= u2) by (simpl in H6; injection H6; intros H7; rewrite <- H7;
-                      apply Zle_min_r).
+                      apply Z.le_min_r).
 rewrite Zle_to_Zmin; auto; omega.
 Qed.
 
@@ -719,8 +718,8 @@ Lemma not_cp_min_cp_max :
   forall a b, ~cp_min a b = b->cp_max a b = b.
 intros [a | | ][b | | ]; simpl; try (intuition; fail).
 destruct (Zle_or_lt a b).
-rewrite Zmax_comm; rewrite Zle_to_Zmax; auto.
-rewrite Zmin_comm; rewrite Zle_to_Zmin; auto with zarith.
+rewrite Z.max_comm; rewrite Zle_to_Zmax; auto.
+rewrite Z.min_comm; rewrite Zle_to_Zmin; auto with zarith.
 intros Hn; elim Hn; auto.
 Qed.
 
@@ -741,7 +740,7 @@ intros [H1 H2][H3 H4]; split; auto.
 rewrite cp_max_comm; apply cp_max_trans with (comp_add u2 (cZ (-1))).
 destruct u2 as [u2 | | ]; destruct u2' as [u2' | | ]; simpl in *; 
   try discriminate; auto.
-assert (u2 <= u2') by (injection H4; intros a; rewrite <- a; apply Zle_max_l).
+assert (u2 <= u2') by (injection H4; intros a; rewrite <- a; apply Z.le_max_l).
 rewrite Zle_to_Zmax; auto; try omega.
 apply cp_min_r_cp_max_l; rewrite cp_min_comm; auto.
 rewrite add_test_constraint_right_true_ub_cut with (1:=H); auto.
@@ -922,7 +921,7 @@ intros [H1 H2][H3 H4]; split; auto.
 rewrite cp_min_comm; apply cp_min_trans with (comp_add l1 (cZ 1)).
 destruct l1 as [l1 | | ]; destruct l1' as [l1' | | ]; simpl in *; 
   try discriminate; auto.
-assert (l1' <= l1) by (injection H1; intros a; rewrite <- a; apply Zle_min_l).
+assert (l1' <= l1) by (injection H1; intros a; rewrite <- a; apply Z.le_min_l).
 rewrite Zle_to_Zmin; auto; try omega.
 apply cp_max_r_cp_min_l; auto.
 rewrite add_test_constraint_left_true_lb_cut with (1:=H); auto.

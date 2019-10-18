@@ -25,7 +25,7 @@ Qed.
 Definition comp_right (A:Type)(f g:A->option A)(x:A) :=
   match f x with None => None | Some r => g r end.
 
-Implicit Arguments comp_right.
+Arguments comp_right : default implicits.
 
 Theorem comp_right_continuous :
   forall (A:Type)(f:A->option A),

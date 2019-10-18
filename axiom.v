@@ -253,7 +253,7 @@ rewrite (af'_correct r e1 v1);
  try rewrite (af'_correct r e2 v2); auto with zarith.
 Qed.
 
-Hint Resolve beval_true_interpret beval_false_interpret.
+Hint Resolve beval_true_interpret beval_false_interpret : core.
 
 Lemma ax_sem_nax :
   forall m P i Q, ax_sem m P i Q -> nax m P i Q.
@@ -269,7 +269,7 @@ apply nax3 with P'0 Q'0 R'; unfold valid in *; simpl in *; auto.
 apply nax4 with P'0; unfold valid in *; simpl in *; auto.
 Qed.
 
-Hint Resolve ax1 ax2 ax3 ax4.
+Hint Resolve ax1 ax2 ax3 ax4 : core.
 
 Lemma nax_ax_sem :
   forall m P i Q, nax m P i Q -> ax_sem m P i Q.

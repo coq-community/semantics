@@ -480,8 +480,8 @@ Definition string_of_Z_aux (f:positive -> Z -> string -> string) :=
   fun (p:positive)(x:Z)(acc:string) =>
     match x with
       0 => if string_dec acc "" then "0" else acc
-  | _ => let (q,r) := Zdiv_eucl x 10 in
-          f p q (String (ascii_of_nat (nat_of_ascii "0"%char + Zabs_nat r))
+  | _ => let (q,r) := Z.div_eucl x 10 in
+          f p q (String (ascii_of_nat (nat_of_ascii "0"%char + Z.abs_nat r))
                    acc)
   end.
 

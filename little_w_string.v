@@ -19,7 +19,7 @@ Inductive lt_i : string -> string -> Prop :=
 | lti_trans : forall x y z, lt_i x y -> lt_i y z -> lt_i x z.
 
 Definition lt := lt_i.
-Hint Resolve lt0 lt1 lt2 lt3.
+Hint Resolve lt0 lt1 lt2 lt3 : core.
 
 Theorem all_distinct : lt between_cst false_cst /\ lt false_cst ge_cst /\
   lt ge_cst le_cst /\ lt le_cst true_cst.
@@ -131,7 +131,7 @@ end.
 Definition bind (A B:Type) (x:option A)(f:A->option B) : (option B) :=
  match x with Some x' => f x' | None => None end.
 
-Implicit Arguments bind.
+Arguments bind : default implicits.
 
 Notation "a /\ b" := (a_conj a b) : a_scope.
 Notation "a ==> b" := (c_imp a b) (at level 55, right associativity) : a_scope.
