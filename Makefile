@@ -3,7 +3,7 @@ all: Makefile.coq
 
 clean: Makefile.coq
 	+make -f Makefile.coq clean
-	rm -f Makefile.coq
+	rm -rf Makefile.coq* interp.ml* _build
 
 Makefile.coq: Make
 	$(COQBIN)coq_makefile -f _CoqProject -o Makefile.coq
