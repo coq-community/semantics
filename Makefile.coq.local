@@ -1,0 +1,14 @@
+post-all:: little.native proof_sqrt.v test_vcg.lil
+
+little.native: extract_interpret.vo parse_little.mly llex.mll str_little.ml little.ml
+	$(CAMLBIN)ocamlbuild -no-hygiene -classic-display -libs nums $@
+
+proof_sqrt.v: context_sqrt.v tail_sqrt.v sqrt.lil little.native
+	./little.native -vcg-coq < sqrt.lil | cat context_sqrt.v - tail_sqrt.v > proof_sqrt.v
+
+test_vcg.lil: ex_int.lil little.native
+	./little.native -static-analysis < ex_int.lil > test_vcg.lil
+
+clean::
+	rm -f Makefile.coq Makefile.coq.conf interp.ml*
+	rm -rf _build little.native proof_sqrt.v test_vcg.lil

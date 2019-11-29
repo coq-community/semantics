@@ -15,13 +15,3 @@ little.v
 little_w_string.v
 parser.v
 syntax.v
-
-LITTLEDEPS = "extract_interpret.vo parse_little.mly llex.mll str_little.ml little.ml"
-
--extra "little.native" "$(LITTLEDEPS)" "$(CAMLBIN)ocamlbuild -no-hygiene -classic-display -libs nums $@"
--extra proof_sqrt.v
-	"context_sqrt.v tail_sqrt.v sqrt.lil little.native"
-        "./little.native -vcg-coq < sqrt.lil | cat context_sqrt.v - tail_sqrt.v > proof_sqrt.v"
--extra test_vcg.lil
-	"ex_int.lil little.native"
-	"./little.native -static-analysis < ex_int.lil > test_vcg.lil"
