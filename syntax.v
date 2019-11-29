@@ -32,8 +32,8 @@ Fixpoint lookup (A:Type)(l:list(string*A))(def:A)(x:string): A :=
 
 End types.
 Arguments anum [string].
-Arguments skip [string].
-Arguments a_skip [string].
+Arguments skip {string}.
+Arguments a_skip {string}.
 
 Module Type little_syntax.
 Parameter string : Set.

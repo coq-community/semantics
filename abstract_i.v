@@ -636,7 +636,7 @@ Qed.
 
 Lemma compatible_intersect_env :
   forall neg l b l', intersect_env neg l b = Some l' -> compatible l l'.
-intros neg l b; destruct (intersect_case b) as [x e Hb Hi _ | e x Hb _ Hi _ | e1 e2 Hb H1 H2 Hi _].
+intros neg l b; destruct (intersect_case b) as [x e Hb Hi | e x Hb _ Hi | e1 e2 Hb H1 H2 Hi].
 intros l'; rewrite Hi.
 destruct (Ab.add_test_constraint_right neg (ab_lookup l x)
              (ab_eval (ab_lookup l) e)) as [v | ].
@@ -1069,7 +1069,7 @@ Lemma intersect_env_true_none :
    forall l b, intersect_env true l b = None ->
    forall g, i_a Ab.m g (to_a l) -> ~bf' g b.
 intros l b; destruct (intersect_case b) as
-  [x e Hb Hi _ | e x Hb _ Hi _ | e1 e2 Hb H1 H2 Hi _].
+  [x e Hb Hi | e x Hb _ Hi | e1 e2 Hb H1 H2 Hi].
 rewrite Hi.
 case_eq (Ab.add_test_constraint_right true (ab_lookup l x)
           (ab_eval (ab_lookup l) e)).
@@ -1213,7 +1213,7 @@ Lemma intersect_env_true_accept :
   exists l1', intersect_env true l' b = Some l1' /\ thinner_env l1 l1'.
 intros l l' H b l1.
 destruct (intersect_case b) as
-  [x e Hb Hi _ | e x Hb Hn Hi _ | a1 a2 Hb Hn1 Hn2 Hi _].
+  [x e Hb Hi | e x Hb Hn Hi | a1 a2 Hb Hn1 Hn2 Hi].
 rewrite (Hi true l); rewrite (Hi true l'); clear Hi.
 case_eq (Ab.add_test_constraint_right true (ab_lookup l x)
           (ab_eval (ab_lookup l) e)).
@@ -1267,7 +1267,7 @@ Lemma intersect_env_false_accept :
   exists l1', intersect_env false l' b = Some l1' /\ thinner_env l1 l1'.
 intros l l' H b l1.
 destruct (intersect_case b) as
-  [x e Hb Hi _ | e x Hb Hn Hi _ | a1 a2 Hb Hn1 Hn2 Hi _].
+  [x e Hb Hi | e x Hb Hn Hi | a1 a2 Hb Hn1 Hn2 Hi].
 rewrite (Hi false l); rewrite (Hi false l'); clear Hi.
 case_eq (Ab.add_test_constraint_right false (ab_lookup l x)
           (ab_eval (ab_lookup l) e)).

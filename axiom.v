@@ -147,6 +147,7 @@ Fixpoint e_to_f(r:list(string*Z))(g:string->Z)(var:string):Z :=
     if string_dec s var then v else e_to_f tl g var
   end.
 
+Declare Scope a_scope.
 Notation "r @ g" := (e_to_f r g) (at level 30, right associativity): a_scope.
 Delimit Scope a_scope with A.
 Open Scope a_scope.

@@ -192,8 +192,7 @@ if Array.length(Sys.argv) = 2 then
    failwith "command line argument parsing" 
 else
   failwith "command line argument parsing"
-with Failure "command line argument parsing"  ->
+with Failure _ ->
  failwith ("usage: " ^ 
                Sys.argv.(0) ^ 
                " [-interpreter | -vcg | -vcg-coq | -static-analysis] < file")
-
