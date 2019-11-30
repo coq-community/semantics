@@ -3,7 +3,8 @@ Require Import List.
 Open Scope list_scope.
 Open Scope Z_scope.
 Open Scope string_scope.
-Import String str intervals syntax AB A D L B.
+
+Import String str intervals syntax AB A D L B BinIntDef.
 
 Definition state1 :=  (("n",(cZ 0,cZ 500))::("x",(cZ 0,cZ 0))::("y",(cZ 0,cZ 0))::nil).
 

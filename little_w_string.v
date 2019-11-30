@@ -131,7 +131,7 @@ end.
 Definition bind (A B:Type) (x:option A)(f:A->option B) : (option B) :=
  match x with Some x' => f x' | None => None end.
 
-Implicit Arguments bind.
+Arguments bind : default implicits.
 
 Notation "a /\ b" := (a_conj a b) : a_scope.
 Notation "a ==> b" := (c_imp a b) (at level 55, right associativity) : a_scope.

@@ -152,7 +152,7 @@ Fixpoint lookup (r:env)(name:string){struct r} : option Z :=
 Definition bind (A B:Type)(v:option A)(f:A->option B) :
      option B :=
   match v with Some x => f x | None => None end.
-Implicit Arguments bind.
+Arguments bind : default implicits.
 
 Fixpoint af (r:env)(a:aexpr) {struct a}: option Z :=
   match a with
@@ -184,7 +184,7 @@ Fixpoint uf (r:env)(x:string)(n:Z){struct r}
 Definition bind2 (A B C:Type)(v:option(A*B))
   (f: A->B->option C) :option C:=
   match v with Some(a,b) => f a b | None => None end.
-Implicit Arguments bind2.
+Arguments bind2 : default implicits.
 
 Definition eq_skip (i:instr) : {i=skip}+{i<>skip}.
 case i; auto; right; discriminate.
@@ -316,7 +316,7 @@ Proof with eauto.
   intros v1 Heq1 v2 Heq2 Heq; injection Heq; intros; subst...
 Qed.
 
-Hint Resolve af_eval Zge_le.
+Hint Resolve af_eval Z.ge_le.
 
 Lemma bf_eval :
   forall r e v, bf r e = Some v -> beval r e v.

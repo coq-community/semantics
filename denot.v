@@ -24,7 +24,7 @@ Qed.
 
 Definition phi := fun A t f => Tarski_fix (F_phi A t f).
 
-Implicit Arguments phi.
+Arguments phi : default implicits.
 
 (* reasoning tools. *)
 
