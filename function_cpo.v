@@ -26,7 +26,7 @@ Proof.
 intuition.
 Qed.
 
-Lemma unique_lub : 
+Lemma unique_lub :
   forall (f:nat->A)(x y: A),
      antisymmetric R ->
      lub x f -> lub y f -> x = y.
@@ -61,7 +61,7 @@ Definition monotonic (f:A -> B) :=
 
 Definition continuous (f:A -> B) :=
   forall (c: nat -> A),  chain R c ->
-    forall (l:A), lub R l c -> 
+    forall (l:A), lub R l c ->
     lub R' (f l) (fun n => f (c n)).
 
 Lemma continuous_imp_monotonic :
@@ -102,7 +102,7 @@ Section Tarski_theory.
 
 Variables (A:Type)(R:A->A->Prop)(bot : A)(f:A->A).
 
-Hypotheses (Hr : reflexive R)(Ha : antisymmetric R) 
+Hypotheses (Hr : reflexive R)(Ha : antisymmetric R)
    (Ht : transitive R) (Hc : complete R)
    (Hb : forall x, R bot x)(Hct : continuous R R f).
 
@@ -123,14 +123,14 @@ apply (f_monotonic (iter n bot) (iter (S n) bot)). assumption.
 Qed.
 
 Lemma phi_ub_iter_add_f :
-   forall phi : A, 
+   forall phi : A,
        upper_bound R phi (fun n => iter n bot) ->
        upper_bound R phi (fun n => f (iter n bot)).
 intros phi Hup p; apply (Hup (S p)).
 Qed.
 
 Lemma f_phi_upper_bound :
-   forall phi : A, 
+   forall phi : A,
        upper_bound R phi (fun n => iter n bot) ->
        upper_bound R (f phi) (fun n => iter n bot).
 intros phi Hup [ | p].
@@ -138,7 +138,7 @@ apply Hb.
 apply (f_monotonic (iter p bot)); apply (Hup p).
 Qed.
 
-Lemma lub_iterates_fixpoint : 
+Lemma lub_iterates_fixpoint :
    forall phi : A, lub R phi (fun n => iter n bot) -> phi = f phi.
 intros phi [Hub Hl]; apply Ha.
 apply Hl; apply f_phi_upper_bound; assumption.
@@ -147,7 +147,7 @@ apply (Hct (fun n => iter n bot) Hchain_iter_f_bot phi);split;assumption.
 destruct Hfphi as [Hub' Hl'].
 apply Hl'; apply phi_ub_iter_add_f; assumption.
 Qed.
-     
+
 Lemma phi_less_than_fixpoint :
   forall phi : A, lub R phi (fun n => iter n bot) ->
   forall psi : A, psi = f psi -> R phi psi.
@@ -240,7 +240,7 @@ elim (classic (forall n, f n = None)).
 intros Hn; exists (None (A:=A)).
 split; intros p; try rewrite Hn; auto.
 intros Hnotforall.
-elim not_all_ex_not with 
+elim not_all_ex_not with
    (P:= fun x => f x = None) (1:= Hnotforall).
 intros n Hneq; exists (f n); split; [auto | intros y; auto].
 Qed.
@@ -406,7 +406,7 @@ Qed.
 
 Theorem lub_some_witness1 :
    forall (A:Type) (c:nat -> option A)(v:A),
-   lub (@option_cpo A) (Some v) c -> 
+   lub (@option_cpo A) (Some v) c ->
    (exists n:nat, c n = Some v).
 intros A c v [Hup Hl].
 elim (classic (forall n, c n = None)).
@@ -415,7 +415,7 @@ assert (Hnone_aux : option_cpo (Some v) None).
 apply Hl.
 intros n.
 rewrite Hnone; auto.
-inversion Hnone_aux.	
+inversion Hnone_aux.
 intros Hnot_all.
 assert (Hex_not : exists n, c n <> None).
 apply not_all_ex_not with (U:=nat)
@@ -429,7 +429,7 @@ elim Hneq; auto.
 Qed.
 
 Theorem lub_some_witness :
-   forall (A B:Type) c (a:A)(b:B)(f:A->option B), f a = Some b -> 
+   forall (A B:Type) c (a:A)(b:B)(f:A->option B), f a = Some b ->
    lub (lift_order A (option B) (option_cpo (A:=B))) f c  ->
    (exists n:nat, c n a = Some b).
 intros A B c a b f Heq Hlub.

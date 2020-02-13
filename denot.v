@@ -28,8 +28,8 @@ Arguments phi : default implicits.
 
 (* reasoning tools. *)
 
-Lemma phi_terminates_n : 
-  forall (A:Type) (t:A->option bool)  f r r', 
+Lemma phi_terminates_n :
+  forall (A:Type) (t:A->option bool)  f r r',
   phi t f r = Some r' ->
   exists n, iter _ (F_phi A t f) n (fun g => None) r = Some r'.
 intros A t f r r' Heq.
@@ -42,7 +42,7 @@ unfold phi, F_phi, f_order'; apply Tarski_fix_prop.
 exact (F_phi_continuous A t f).
 apply (lub_some_witness _ _ _ r r' (phi t f) Heq Hlub).
 Qed.
-   
+
 Lemma fix_phi :
   forall (A:Type)(t:A->option bool) f,
   F_phi A t f (phi t f) = phi t f.
@@ -73,13 +73,13 @@ induction i.
 intros l l'; simpl; unfold bind.
 generalize (af_eval l a).
  case' (af l a).
-intros v He. 
-generalize (uf_s l s v). 
+intros v He.
+generalize (uf_s l s v).
 intros Hu Heq.
 rewrite Heq in Hu.
 eauto.
 
-simpl; unfold comp_right; intros l l'. 
+simpl; unfold comp_right; intros l l'.
 generalize (IHi1 l); case' (ds i1 l).
 intros l1 Hi1; generalize (IHi2 l1).
 simpl; intros IHi2' Heq; rewrite Heq in IHi2'.
@@ -89,7 +89,7 @@ simpl; intros l l' Heq.
 pose (f:= F_phi (list(string*Z))
    (fun l => bf l b)(ds i)).
 
-assert (Hn: exists n:nat, 
+assert (Hn: exists n:nat,
           iter _ f n (fun _ : list(string*Z) => None) l =
           Some l').
 apply (phi_terminates_n _ (fun l => bf l b)(ds i)).
@@ -98,7 +98,7 @@ assumption.
 case Hn; intros n; generalize l; clear Heq Hn l.
 induction n; intros l.
 simpl; intros; discriminate.
-simpl. unfold f at 1, F_phi, ifthenelse at 1.  
+simpl. unfold f at 1, F_phi, ifthenelse at 1.
 generalize (bf_eval l b); case' (bf l b).
 intros [|] Hevalb.
 unfold bind at 1.

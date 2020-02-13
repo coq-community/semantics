@@ -40,8 +40,8 @@ assert (Hle : forall x y, lt x y -> x = le_cst -> y = true_cst).
 intros x y H; elim H; try (intros; discriminate); auto.
 intros x' y' z Hxy Hi1 Hyz Hi2 Hx; rewrite Hi1 in Hyz; auto.
 destruct (Hin _ _ Hyz) as [H' | [H' | [H' | H']]]; discriminate H'.
-assert (Hin2 : 
-        forall x y, lt x y -> forall z, 
+assert (Hin2 :
+        forall x y, lt x y -> forall z,
              lt y z -> x = between_cst \/ x = false_cst \/
              x = ge_cst).
 intros x y H; elim H; eauto.
@@ -109,20 +109,20 @@ Ltac compute_vcg :=
   lazy beta iota zeta delta [
   vcg valid_l i_lc i_c i_a f_p
   str.string_dec String.string_dec string_rec string_rect sumbool_rec
-  sumbool_rect Ascii.ascii_dec Ascii.ascii_rec Ascii.ascii_rect 
+  sumbool_rect Ascii.ascii_dec Ascii.ascii_rec Ascii.ascii_rect
   bool_dec bool_rec bool_rect eq_rec_r eq_rec eq_rect sym_eq lf'
   af' bf' pc mark List.app a_subst subst l_subst].
 
 Ltac list_conj :=
   match goal with |- True => trivial
     | _ => split;[idtac | list_conj]
-  end. 
+  end.
 
 
 (* Specialized tactics to use the vcg. *)
 
 Ltac abstract_vars g :=
-match goal with |- context[g ?s] => 
+match goal with |- context[g ?s] =>
    generalize (g s); intro; abstract_vars g
  | _ => clear g
 end.

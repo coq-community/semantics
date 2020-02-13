@@ -50,7 +50,7 @@ Axiom lt_irrefl : forall x, ~lt x  x.
 Axiom lt_trans : forall x y z, lt x y -> lt y z -> lt x z.
 
 Axiom all_distinct :
-  lt between_cst false_cst /\ lt false_cst ge_cst /\ 
+  lt between_cst false_cst /\ lt false_cst ge_cst /\
   lt ge_cst le_cst /\ lt le_cst true_cst.
 
 Definition aexpr := aexpr0 string.

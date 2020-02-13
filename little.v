@@ -64,7 +64,7 @@ Inductive sos_star : env->instr->instr->env->Prop :=
   SOS6 : forall r i, sos_star r i i r
 | SOS7 : forall r r' r'' i i' i'',
              sos_step r i i' r' -> sos_star r' i' i'' r'' ->
-             sos_star r i i'' r''.         
+             sos_star r i i'' r''.
 
 Hint Resolve SOS1 SOS2 SOS3 SOS5 SOS4 SOS6 SOS7 : core.
 
@@ -166,15 +166,15 @@ Fixpoint af (r:env)(a:aexpr) {struct a}: option Z :=
 Definition bf (r:env)(b:bexpr) : option bool :=
   let (e1, e2) := b in
   bind (af r e1)
-    (fun v1 => bind (af r e2) 
-      (fun v2 => 
+    (fun v1 => bind (af r e2)
+      (fun v2 =>
        if Zlt_bool v1 v2 then Some true else Some false)).
 
 Fixpoint uf (r:env)(x:string)(n:Z){struct r}
-  : option(env) := 
+  : option(env) :=
     match r with
       nil => None
-    | (y,n')::tl => 
+    | (y,n')::tl =>
       if string_dec y x then
         Some((x,n)::tl)
       else
@@ -217,7 +217,7 @@ Fixpoint f_star (n:nat)(r:env)(i:instr){struct n}
   end.
 
 Lemma aeval_lookup :
-  forall r e n, aeval r e n -> 
+  forall r e n, aeval r e n ->
     forall name, e = avar name -> lookup r name = Some n.
 Proof.
  intros r e n H; elim H; simpl.
@@ -297,11 +297,11 @@ Ltac find_deep_bind a :=
 
 Ltac unbind_hyp H v Heq :=
   match type of H with
-  |  bind ?a ?b = Some _ => 
+  |  bind ?a ?b = Some _ =>
      let c := find_deep_bind a in
      (case_eq c; [intros v Heq | intros Heq]; rewrite Heq in H;
      [simpl in H | discriminate H])
-  |  bind2 ?a ?b = Some _ => 
+  |  bind2 ?a ?b = Some _ =>
      let c := find_deep_bind a in
      case_eq c; [intros v Heq | intros Heq]; rewrite Heq in H;
      [simpl in H | discriminate H]
@@ -348,7 +348,7 @@ Lemma f_sos_sos_step :
  forall r i r' i', f_sos r i = Some(r',i') -> sos_step r i i' r'.
 Proof with eauto.
 intros r i r'; induction i; intros i' H.
-simpl in H; unbind_hyp H v1 He; unbind_hyp H r1 Hu; 
+simpl in H; unbind_hyp H v1 He; unbind_hyp H r1 Hu;
   injection H; intros; subst...
 simpl in H.
 destruct (eq_skip i1).
@@ -371,13 +371,13 @@ subst i; injection H; intros; subst...
  unbind_hyp H p H1; destruct p as [r1 i1]...
 Qed.
 
-Lemma f_star_exec : forall n r i r', 
+Lemma f_star_exec : forall n r i r',
   f_star n r i = Some(r',skip) -> exec r i r'.
 Proof.
 intros; apply sos_imp_sn; eapply f_star_sem; eauto.
 Qed.
 
-Lemma sos_star_f : forall r i r' i', sos_star r i i' r' -> 
+Lemma sos_star_f : forall r i r' i', sos_star r i i' r' ->
   exists n, f_star n r i = Some(r', i').
 induction 1.
 exists 0%nat; simpl; auto.
@@ -400,7 +400,7 @@ Definition one_hundred := 100%nat.
 Ltac add_exec_hyp_aux id r i i' r' :=
   let res := eval vm_compute in (f_star one_hundred r' i') in
   match res with
-  | Some(?r'', ?i'') => 
+  | Some(?r'', ?i'') =>
      (cut (sos_star r i i'' r'');
        [clear id; intros id |
         apply sos_star_trans with (1:= id);
@@ -415,7 +415,7 @@ Ltac add_exec_hyp_aux id r i i' r' :=
 Ltac add_exec_hyp id r i :=
   assert (id : sos_star r i i r); [apply SOS6 | add_exec_hyp_aux id r i i r].
 
-  
+
 Ltac solve_exec_aux r i :=
   let H := fresh "Hse" in
   (add_exec_hyp H r i; (eapply ex_intro || eapply exist); eapply H).

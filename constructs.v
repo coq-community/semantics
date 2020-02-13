@@ -42,7 +42,7 @@ intros n; unfold comp_right; case (f x);
 case_eq (f x).
 intros a Hfxeqa.
 unfold comp_right; rewrite Hfxeqa.
-generalize (lub_lift_reverse A (option A) (option_cpo (A:=A)) c l 
+generalize (lub_lift_reverse A (option A) (option_cpo (A:=A)) c l
             (conj Hu Hl) a).
 intros [_ Hlla].
 apply Hlla.
@@ -57,16 +57,16 @@ Definition ifthenelse (A:Type)(t:option bool)(v w: option A) :=
   match t with Some true => v | Some false => w | None => None end.
 
 Notation "'IF x 'THEN a 'ELSE b" :=
-   (ifthenelse _ x a b) (at level 200). 
+   (ifthenelse _ x a b) (at level 200).
 
 Theorem ifthenelse_continuous :
-  forall (A:Type) t F G, 
+  forall (A:Type) t F G,
      continuous (f_order' A) (f_order' A) F ->
      continuous (f_order' A) (f_order' A) G ->
      continuous (f_order' A) (f_order' A)
        (fun f x => 'IF (t x) 'THEN (F f x) 'ELSE (G f x)).
 Proof.
-intros A t F G HF HG c Hc l Hl. 
+intros A t F G HF HG c Hc l Hl.
 apply (lift_lub A (option A) (@option_cpo A)).
 intros x; destruct (t x) as [[ | ] | ]; simpl.
 apply lub_lift_reverse with (l := F l)(c:= fun n => F (c n));

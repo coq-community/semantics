@@ -24,6 +24,8 @@ _build
 *.v.d
 *.vio
 *.vo
+*.vok
+*.vos
 .coq-native/
 .csdp.cache
 .lia.cache
@@ -39,3 +41,4 @@ nra.cache
 .coqdeps.d
 Makefile.coq
 Makefile.coq.conf
+.Makefile.coq.d
