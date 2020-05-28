@@ -1,6 +1,7 @@
 ---
 fullname: Semantics
 shortname: semantics
+namespace: Semantics
 organization: coq-community
 community: true
 
@@ -20,10 +21,12 @@ description: |
   parameterized by a module type of strings.  A hand-written parser is
   also provided in Coq, but there are no proofs associated.
 
-paper:
-  doi: 10.1017/CBO9780511770524.016
-  url: https://hal.inria.fr/inria-00160309
-  title: Theorem proving support in programming language semantics
+doi: 10.1017/CBO9780511770524.016
+
+publications:
+- pub_doi: 10.1017/CBO9780511770524.016
+  pub_url: https://hal.inria.fr/inria-00160309
+  pub_title: Theorem proving support in programming language semantics
 
 authors:
 - name: Yves Bertot
