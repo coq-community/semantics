@@ -1,10 +1,13 @@
 # Semantics
 
+[![CI][action-shield]][action-link]
 [![Contributing][contributing-shield]][contributing-link]
 [![Code of Conduct][conduct-shield]][conduct-link]
 [![Zulip][zulip-shield]][zulip-link]
 [![DOI][doi-shield]][doi-link]
 
+[action-shield]: https://github.com/coq-community/semantics/workflows/CI/badge.svg?branch=master
+[action-link]: https://github.com/coq-community/semantics/actions?query=workflow%3ACI
 
 [contributing-shield]: https://img.shields.io/badge/contributions-welcome-%23f7931e.svg
 [contributing-link]: https://github.com/coq-community/manifesto/blob/master/CONTRIBUTING.md
