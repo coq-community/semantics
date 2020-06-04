@@ -1,10 +1,13 @@
 # Semantics
 
+[![CI][action-shield]][action-link]
 [![Contributing][contributing-shield]][contributing-link]
 [![Code of Conduct][conduct-shield]][conduct-link]
-[![Gitter][gitter-shield]][gitter-link]
+[![Zulip][zulip-shield]][zulip-link]
 [![DOI][doi-shield]][doi-link]
 
+[action-shield]: https://github.com/coq-community/semantics/workflows/CI/badge.svg?branch=master
+[action-link]: https://github.com/coq-community/semantics/actions?query=workflow%3ACI
 
 [contributing-shield]: https://img.shields.io/badge/contributions-welcome-%23f7931e.svg
 [contributing-link]: https://github.com/coq-community/manifesto/blob/master/CONTRIBUTING.md
@@ -12,8 +15,9 @@
 [conduct-shield]: https://img.shields.io/badge/%E2%9D%A4-code%20of%20conduct-%23f15a24.svg
 [conduct-link]: https://github.com/coq-community/manifesto/blob/master/CODE_OF_CONDUCT.md
 
-[gitter-shield]: https://img.shields.io/badge/chat-on%20gitter-%23c1272d.svg
-[gitter-link]: https://gitter.im/coq-community/Lobby
+[zulip-shield]: https://img.shields.io/badge/chat-on%20zulip-%23c1272d.svg
+[zulip-link]: https://coq.zulipchat.com/#narrow/stream/237663-coq-community-devs.20.26.20users
+
 
 [doi-shield]: https://zenodo.org/badge/DOI/10.1017/CBO9780511770524.016.svg
 [doi-link]: https://doi.org/10.1017/CBO9780511770524.016
@@ -29,9 +33,6 @@ parameterized by a module type of strings.  A hand-written parser is
 also provided in Coq, but there are no proofs associated.
 
 
-More details about the project can be found in the paper
-[Theorem proving support in programming language semantics](https://hal.inria.fr/inria-00160309).
-
 ## Meta
 
 - Author(s):
@@ -40,14 +41,28 @@ More details about the project can be found in the paper
   - Kartik Singhal ([**@k4rtik**](https://github.com/k4rtik))
 - License: [MIT License](LICENSE)
 - Compatible Coq versions: 8.10 or later
-- Additional Coq dependencies: none
+- Additional dependencies: none
+- Coq namespace: `Semantics`
+- Related publication(s):
+  - [Theorem proving support in programming language semantics](https://hal.inria.fr/inria-00160309) doi:[10.1017/CBO9780511770524.016](https://doi.org/10.1017/CBO9780511770524.016)
 
-## Build instructions
+## Building and installation instructions
+
+The easiest way to install the latest released version of Semantics
+is via [OPAM](https://opam.ocaml.org/doc/Install.html):
+
+```shell
+opam repo add coq-released https://coq.inria.fr/opam/released
+opam install coq-semantics
+```
+
+To instead build and install manually, do:
 
 ``` shell
-git clone https://github.com/coq-community/semantics
+git clone https://github.com/coq-community/semantics.git
 cd semantics
-make   # or make -j <number-of-cores-on-your-machine>
+make   # or make -j <number-of-cores-on-your-machine> 
+make install
 ```
 
 
