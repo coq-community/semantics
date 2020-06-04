@@ -1,5 +1,5 @@
 opam-version: "2.0"
-maintainer: "palmskog@gmail.com"
+maintainer: "kartiksinghal@gmail.com"
 version: "dev"
 
 homepage: "https://github.com/coq-community/semantics"
