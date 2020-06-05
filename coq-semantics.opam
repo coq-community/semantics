@@ -1,6 +1,6 @@
 opam-version: "2.0"
 maintainer: "kartiksinghal@gmail.com"
-version: "dev"
+version: "8.11.1"
 
 homepage: "https://github.com/coq-community/semantics"
 dev-repo: "git+https://github.com/coq-community/semantics.git"
