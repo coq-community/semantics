@@ -9,7 +9,7 @@ action: true
 synopsis: >-
   A survey of semantics styles, from natural semantics through
   structural operational, axiomatic, and denotational semantics, to
-  abstract interpretation.
+  abstract interpretation
 
 description: |
   This is a survey of programming language semantics styles
