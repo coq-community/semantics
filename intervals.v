@@ -1,4 +1,5 @@
 Require Import ZArith List.
+Require Import Lia.
 Open Scope Z_scope.
 Open Scope list_scope.
 
@@ -52,7 +53,7 @@ unfold Z.ge.
 case_eq (n ?= n'); intros Heq H; try (elim H; auto; fail).
 rewrite Zcompare_Eq_eq with (1:=Heq); auto.
 auto.
-omega.
+lia.
 Qed.
 
 Lemma cp_min_assoc :
@@ -381,8 +382,8 @@ Lemma to_p_thinner : forall l u x, to_p (l,u) x ->
     thinner (l, cZ x) (l, u)/\ thinner (cZ x, u)(l,u).
 intros [l | |] [u | |] x ;unfold to_p, thinner; simpl; try(intuition;fail);
 repeat rewrite Zmin_idempotent; repeat rewrite Zmax_idempotent.
-intros; rewrite Z.max_comm; rewrite Zle_to_Zmax; try omega;
- rewrite Z.min_comm; rewrite Zle_to_Zmin; auto; omega.
+intros; rewrite Z.max_comm; rewrite Zle_to_Zmax; try lia;
+ rewrite Z.min_comm; rewrite Zle_to_Zmin; auto; lia.
 intros; rewrite Z.min_comm; rewrite Zle_to_Zmin; auto.
 intros; rewrite Z.max_comm; rewrite Zle_to_Zmax; auto.
 Qed.
@@ -394,7 +395,7 @@ intros i1 i2 x1 x2 H1 H2.
 destruct i1 as [[l1 | | ][u1 | | ]]; generalize H1; simpl;
  clear H1; intros H1; contradiction || auto;
 destruct i2 as [[l2 | | ][u2 | | ]]; generalize H2; simpl;
- intros; contradiction || auto; try omega.
+ intros; contradiction || auto; try lia.
 Qed.
 
 Lemma of_int_correct : forall n, to_p (of_int n) n.
@@ -534,13 +535,13 @@ assert (x1 <= u1) by (simpl in H4; injection H4; intros H7; rewrite <- H7;
 assert (x2 <= u2) by (simpl in H6; injection H6; intros H7; rewrite <- H7;
                       apply Z.le_min_r).
 destruct (Zle_or_lt u1 (u2+ -1)).
-rewrite (Zle_to_Zmin u1); try omega.
+rewrite (Zle_to_Zmin u1); try lia.
 rewrite Zle_to_Zmin; auto.
-rewrite (Z.min_comm u1); rewrite (Zle_to_Zmin (u2+ -1)); try omega.
-rewrite Zle_to_Zmin; auto; omega.
+rewrite (Z.min_comm u1); rewrite (Zle_to_Zmin (u2+ -1)); try lia.
+rewrite Zle_to_Zmin; auto; lia.
 assert (x2 <= u2) by (simpl in H6; injection H6; intros H7; rewrite <- H7;
                       apply Z.le_min_r).
-rewrite Zle_to_Zmin; auto; omega.
+rewrite Zle_to_Zmin; auto; lia.
 Qed.
 
 (* The next proof should be about the same, but is a textually shorter
@@ -560,8 +561,8 @@ destruct b2 as [b2 | | ]; try (simpl; intuition;fail);
 destruct u2 as [u2 | | ]; try (simpl; intuition; fail); simpl;
  try (assert (b1 <> u2) by
      (intros h;subst u2; elim Heq; rewrite cp_min_refl; auto));
-   try (case (Zmax_irreducible_inf (b1+1) b2);(intros; omega));
-   try (intros; omega).
+   try (case (Zmax_irreducible_inf (b1+1) b2);(intros; lia));
+   try (intros; lia).
 Qed.
 
 Lemma add_test_constraint_right_false_sound :
@@ -577,7 +578,7 @@ destruct b1 as [b1 | | ]; destruct u1 as [u1 | | ];
  simpl; try (simpl;intuition;fail);
 destruct b2 as [b2 | | ]; destruct u2 as [u2 | | ];
  simpl; try (simpl;intuition;fail); try (intros;discriminate);
-try (case (Zmax_irreducible_inf b1 b2); intros; omega).
+try (case (Zmax_irreducible_inf b1 b2); intros; lia).
 intros H'; injection H'; intro; subst v; clear H'.
 destruct b1 as [b1 | | ]; destruct u1 as [u1 | | ]; 
  simpl; try (simpl;intuition;fail);
@@ -603,7 +604,7 @@ destruct b1 as [b1 | | ]; destruct u1 as [u1 | | ];
  simpl; try (simpl;intuition;fail);
 destruct b2 as [b2 | | ]; destruct u2 as [u2 | | ];
  simpl; try (simpl;intuition;fail); try (intros;discriminate);
-try (case (Zmin_irreducible u1 u2); omega).
+try (case (Zmin_irreducible u1 u2); lia).
 intros H'; injection H'; intro; subst v; clear H'.
 destruct b1 as [b1 | | ]; destruct u1 as [u1 | | ]; 
  simpl; try (simpl;intuition;fail);
@@ -741,7 +742,7 @@ rewrite cp_max_comm; apply cp_max_trans with (comp_add u2 (cZ (-1))).
 destruct u2 as [u2 | | ]; destruct u2' as [u2' | | ]; simpl in *; 
   try discriminate; auto.
 assert (u2 <= u2') by (injection H4; intros a; rewrite <- a; apply Z.le_max_l).
-rewrite Zle_to_Zmax; auto; try omega.
+rewrite Zle_to_Zmax; auto; try lia.
 apply cp_min_r_cp_max_l; rewrite cp_min_comm; auto.
 rewrite add_test_constraint_right_true_ub_cut with (1:=H); auto.
 destruct (ext_eq u1' (cp_min u1' (comp_add u2' (cZ (-1))))).
@@ -922,7 +923,7 @@ rewrite cp_min_comm; apply cp_min_trans with (comp_add l1 (cZ 1)).
 destruct l1 as [l1 | | ]; destruct l1' as [l1' | | ]; simpl in *; 
   try discriminate; auto.
 assert (l1' <= l1) by (injection H1; intros a; rewrite <- a; apply Z.le_min_l).
-rewrite Zle_to_Zmin; auto; try omega.
+rewrite Zle_to_Zmin; auto; try lia.
 apply cp_max_r_cp_min_l; auto.
 rewrite add_test_constraint_left_true_lb_cut with (1:=H); auto.
 destruct (ext_eq l2' (cp_max (comp_add l1' (cZ 1)) l2')).

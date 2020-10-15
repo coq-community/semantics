@@ -1,4 +1,5 @@
 Require Import little_w_string parser ZArith List String.
+Require Import Lia.
 Open Scope string_scope.
 Open Scope Z_scope.
 Open Scope a_scope.
@@ -41,8 +42,8 @@ unfold ex_m; compute_vcg; unfold le_list, pp.
 clear; intros g;
   generalize (g "x")(g "y")(g "n"); intros x y n.
 list_conj.
-intros; assert (x = n) by omega; subst x; intuition.
-intros [H1 [H2 H3]]; split;[omega|idtac].
+intros; assert (x = n) by lia; subst x; intuition.
+intros [H1 [H2 H3]]; split;[lia|idtac].
 apply hyp_both_side with (c:=1) (1:= H3); ring.
 split; [exact Hn| vm_compute; trivial].
 Qed.
@@ -84,8 +85,8 @@ unfold eq_rec.
 unfold eq_rect.
 unfold sym_eq.
 
-intros; assert (x = n) by omega; subst x; intuition.
-intros [H1 [H2 H3]]; split;[omega|idtac].
+intros; assert (x = n) by lia; subst x; intuition.
+intros [H1 [H2 H3]]; split;[lia|idtac].
 apply hyp_both_side with (c:=1) (1:= H3); ring.
 split; [exact Hn| vm_compute; trivial].
 Qed.

@@ -1,4 +1,5 @@
 Require Import ZArith List syntax.
+Require Import Lia.
 Open Scope Z_scope.
 
 
@@ -249,7 +250,7 @@ Proof.
   rewrite aeval_f with (1:= H);
   rewrite aeval_f with (1:= H0);simpl;
   generalize (Zlt_cases v1 v2); case (Zlt_bool v1 v2); auto;
-  intros H'; assert False by omega; contradiction.
+  intros H'; assert False by lia; contradiction.
 Qed.
 
 Lemma s_update_f :

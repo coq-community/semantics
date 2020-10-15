@@ -1,4 +1,5 @@
 Require Import little_w_string parser ZArith List String.
+Require Import Lia.
 Open Scope Z_scope.
 Import AB A D L.
 Open Scope a_scope.
@@ -27,9 +28,9 @@ Import syntax.
   unfold ex_m, pp, le_list;  compute_vcg; expand_semantics.
 intros g; generalize (g "x")(g "y")(g "n"); intros x y n; clear.
 list_conj.
-intros [Hnlt [Hxlen Heq']];  assert (x=n) by omega; subst x; auto.
+intros [Hnlt [Hxlen Heq']];  assert (x=n) by lia; subst x; auto.
 intros [Hxltn [_ Heq']]; 
- split;[omega | rewrite Zmult_plus_distr_r; rewrite Heq'; ring].
+ split;[lia | rewrite Zmult_plus_distr_r; rewrite Heq'; ring].
 Show.
 parse_it; unfold ex_m, le_list, pp; compute_vcg; expand_semantics; simpl.
 Show.
