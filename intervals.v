@@ -26,7 +26,7 @@ Definition cp_min (n1 n2:ext_Z) : ext_Z :=
   match n1, n2 with
     minfty, a => minfty
   | cZ n1, cZ n2 => cZ (Z.min n1 n2)
-  | a, minfty => minfty
+  | _, minfty => minfty
   | a, pinfty => a
   | pinfty, a => a
   end.
@@ -37,7 +37,7 @@ Definition cp_max (n1 n2:ext_Z) : ext_Z :=
     minfty, a => a
   | cZ n1, cZ n2 => cZ (Z.max n1 n2)
   | a, minfty => a
-  | pinfty, a => pinfty
+  | pinfty, _ => pinfty
   | a, pinfty => pinfty
   end.
 
@@ -122,7 +122,7 @@ Definition add_test_constraint_left (d:bool) (i j:ext_Z*ext_Z) : option (ext_Z*e
 
 Definition widen (i j:ext_Z*ext_Z) :=
   let (bi, ui) := i in let (bj, uj) := j in
-  let b := 
+  let b :=
     if ext_eq (cp_min bi bj) bi then bi
     else minfty in
   let u :=
@@ -191,7 +191,7 @@ Qed.
 
 Lemma cp_min_plus :
   forall x y z t,
-    cp_min x y = x -> cp_min z t = z -> 
+    cp_min x y = x -> cp_min z t = z ->
     cp_min (comp_add x z)(comp_add y t)= comp_add x z.
 intros [x | | ] [y | | ];simpl;try (intros;discriminate);
 intros [z | | ] [t' | | ];simpl; try (intros; discriminate); auto.
@@ -204,7 +204,7 @@ Qed.
 
 Lemma cp_max_plus :
   forall x y z t,
-    cp_max x y = x -> cp_max z t = z -> 
+    cp_max x y = x -> cp_max z t = z ->
     cp_max (comp_add x z)(comp_add y t)= comp_add x z.
 intros [x | | ] [y | | ];simpl;try (intros;discriminate);
 intros [z | | ] [t' | | ];simpl; try (intros; discriminate); auto.
@@ -240,7 +240,7 @@ intros; subst; auto.
 Qed.
 
 Lemma eq_complete : forall x, eq x x = true.
-intros [[l | |][u| |]]; simpl; auto; 
+intros [[l | |][u| |]]; simpl; auto;
 try case (Z.eq_dec l l); try case (Z.eq_dec u u); intros; auto;
 try match goal with id :~_ |- _ => case id; apply refl_equal end.
 Qed.
@@ -325,7 +325,7 @@ Ltac Zmin_max_to_le :=
  end.
 
 Ltac cp_max_min_diff :=
-  match goal with 
+  match goal with
   | id : cZ ?a <> cp_max (cZ ?a) (cZ ?b) |- _ =>
     assert (Dummy:=id); clear id ;
     assert (id : a <> b) by
@@ -333,15 +333,15 @@ Ltac cp_max_min_diff :=
     clear Dummy
   | id : cZ ?a <> cp_max (cZ ?b) (cZ ?a) |- _ =>
     assert (Dummy:=id); clear id;
-    assert (id : a <> b) by 
+    assert (id : a <> b) by
       (intros Dummy';case Dummy; rewrite Dummy'; rewrite cp_max_refl; auto)
   | id : cZ ?a <> cp_min ?a ?b |- _ =>
     assert (Dummy:=id); clear id;
-    assert (id : a <> b) by 
+    assert (id : a <> b) by
       (intros Dummy';case Dummy; rewrite Dummy'; rewrite cp_min_refl; auto)
   | id : cZ ?a <> cp_min (cZ ?b) (cZ ?a) |- _ =>
     assert (Dummy:=id); clear id;
-    assert (id : a <> b) by 
+    assert (id : a <> b) by
       (intros Dummy';case Dummy; rewrite Dummy'; rewrite cp_min_refl; auto)
   end.
 
@@ -378,7 +378,7 @@ Definition to_p (v:ext_Z*ext_Z)(x:Z) : Prop :=
   | _ => False
   end.
 
-Lemma to_p_thinner : forall l u x, to_p (l,u) x -> 
+Lemma to_p_thinner : forall l u x, to_p (l,u) x ->
     thinner (l, cZ x) (l, u)/\ thinner (cZ x, u)(l,u).
 intros [l | |] [u | |] x ;unfold to_p, thinner; simpl; try(intuition;fail);
 repeat rewrite Zmin_idempotent; repeat rewrite Zmax_idempotent.
@@ -403,7 +403,7 @@ intros; simpl; auto with zarith.
 Qed.
 
 Lemma to_p_cp_max_min :
-   forall l u x, to_p (l,u) x -> cp_max l (cZ x) = cZ x /\ 
+   forall l u x, to_p (l,u) x -> cp_max l (cZ x) = cZ x /\
                   cp_min (cZ x) u = cZ x.
 intros [l | | ][u | | ]; unfold to_p; simpl; try(intuition; fail).
 intros; rewrite Z.max_comm; rewrite Zle_to_Zmax;try rewrite Zle_to_Zmin;
@@ -439,13 +439,13 @@ Qed.
 
 Lemma add_test_constraint_right_true_none :
    forall v1 v2, add_test_constraint_right true v1 v2 = None ->
-     forall x1 x2, to_p v1 x1 -> 
+     forall x1 x2, to_p v1 x1 ->
      to_p v2 x2 -> ~x1 < x2.
 Proof.
 intros [b1 u1] [b2 u2]; unfold add_test_constraint_right.
 case (ext_eq b1 (cp_max b1 u2)); intros Heq.
 intros _; destruct b1 as [b1 | | ]; destruct u2 as [u2 | | ];
-try (assert (H' : u2 <= b1) by(injection Heq; 
+try (assert (H' : u2 <= b1) by(injection Heq;
             intros h; rewrite h; apply Z.le_max_r));
  destruct u1 as [u1 | | ]; simpl in Heq;
  try discriminate heq; simpl; intros e1 e2 g; simpl;
@@ -461,7 +461,7 @@ Proof.
 intros [b1 u1] [b2 u2]; unfold add_test_constraint_left.
 case (ext_eq b1 (cp_max b1 u2)); intros Heq.
 intros _; destruct b1 as [b1 | | ]; destruct u2 as [u2 | | ];
-try (assert (H' : u2 <= b1) by(injection Heq; 
+try (assert (H' : u2 <= b1) by(injection Heq;
             intros h; rewrite h; apply Z.le_max_r));
  destruct u1 as [u1 | | ]; simpl in Heq;
  try discriminate heq; simpl; intros e1 e2 g; simpl;
@@ -469,7 +469,7 @@ try (assert (H' : u2 <= b1) by(injection Heq;
 destruct b2 as [b2 | | ]; simpl; try(intuition;fail).
 case (ext_eq u2 (cp_min b1 u2)).
 intros Heq' _;destruct b1 as [b1 | | ];destruct u2 as [u2 | | ]; simpl in Heq';
-try (assert (H' : u2 <= b1) by(injection Heq'; 
+try (assert (H' : u2 <= b1) by(injection Heq';
             intros h; rewrite h; apply Z.le_min_l));
  destruct u1 as [u1 | | ]; simpl in Heq;
  try discriminate heq; simpl; intros e1 e2 g;  simpl;
@@ -486,12 +486,12 @@ intros [b1 u1] [b2 u2]; unfold add_test_constraint_right.
 case (ext_eq b2 (cp_max u1 b2)); intros Heq;
 case (ext_eq u1 (cp_max u1 b2)); intros Heq'; try (intros; discriminate).
 intros _; destruct b2 as [b2 | | ]; destruct u1 as [u1 | | ];
-try (assert (H' : u1 <= b2) by 
+try (assert (H' : u1 <= b2) by
  (injection Heq; intros h; rewrite h; apply Z.le_max_l));
 try (assert (H'' : ~u1 = b2)
   by (intros h; subst u1; elim Heq'; rewrite cp_max_refl; auto));
   simpl; try (intuition; fail);
-destruct u2 as [u2 | | ]; 
+destruct u2 as [u2 | | ];
  try discriminate Heq; simpl; intros e1 e2 g;  simpl;
  try(intuition;fail); try discriminate;
 destruct b1 as [b1 | | ]; simpl; try(intuition;fail).
@@ -505,12 +505,12 @@ intros [b1 u1] [b2 u2]; unfold add_test_constraint_left.
 case (ext_eq b2 (cp_max u1 b2)); intros Heq;
 case (ext_eq u1 (cp_max u1 b2)); intros Heq'; try (intros; discriminate).
 intros _; destruct b2 as [b2 | | ]; destruct u1 as [u1 | | ];
-try (assert (H' : u1 <= b2) by 
+try (assert (H' : u1 <= b2) by
  (injection Heq; intros h; rewrite h; apply Z.le_max_l));
 try (assert (H'' : ~u1 = b2)
   by (intros h; subst u1; elim Heq'; rewrite cp_max_refl; auto));
   simpl; try (intuition; fail);
-destruct u2 as [u2 | | ]; 
+destruct u2 as [u2 | | ];
  try discriminate Heq; simpl; intros e1 e2 g;  simpl;
  try(intuition;fail); try discriminate;
 destruct b1 as [b1 | | ]; simpl; try(intuition;fail).
@@ -574,16 +574,16 @@ intros [b1 u1][b2 u2] v x1 x2; unfold add_test_constraint_right.
 case (ext_eq b2 (cp_max u1 b2)); intros Heq.
 case (ext_eq u1 (cp_max u1 b2)); intros Heq'; try (intros; discriminate);
 intros H'; injection H'; intro ; subst v; clear H';
-destruct b1 as [b1 | | ]; destruct u1 as [u1 | | ]; 
+destruct b1 as [b1 | | ]; destruct u1 as [u1 | | ];
  simpl; try (simpl;intuition;fail);
 destruct b2 as [b2 | | ]; destruct u2 as [u2 | | ];
  simpl; try (simpl;intuition;fail); try (intros;discriminate);
 try (case (Zmax_irreducible_inf b1 b2); intros; lia).
 intros H'; injection H'; intro; subst v; clear H'.
-destruct b1 as [b1 | | ]; destruct u1 as [u1 | | ]; 
+destruct b1 as [b1 | | ]; destruct u1 as [u1 | | ];
  simpl; try (simpl;intuition;fail);
-destruct b2 as [b2 | | ]; 
- try (assert (H': b2 <> u1) 
+destruct b2 as [b2 | | ];
+ try (assert (H': b2 <> u1)
         by (intro; elim Heq; subst b2; rewrite cp_max_refl; auto));
 destruct u2 as [u2 | | ];
  try case (Zmax_irreducible_inf b1 b2);
@@ -600,16 +600,16 @@ intros [b1 u1][b2 u2] v x1 x2; unfold add_test_constraint_left.
 case (ext_eq b2 (cp_max u1 b2)); intros Heq.
 case (ext_eq u1 (cp_max u1 b2)); intros Heq'; try (intros; discriminate);
 intros H'; injection H'; intro ; subst v; clear H';
-destruct b1 as [b1 | | ]; destruct u1 as [u1 | | ]; 
+destruct b1 as [b1 | | ]; destruct u1 as [u1 | | ];
  simpl; try (simpl;intuition;fail);
 destruct b2 as [b2 | | ]; destruct u2 as [u2 | | ];
  simpl; try (simpl;intuition;fail); try (intros;discriminate);
 try (case (Zmin_irreducible u1 u2); lia).
 intros H'; injection H'; intro; subst v; clear H'.
-destruct b1 as [b1 | | ]; destruct u1 as [u1 | | ]; 
+destruct b1 as [b1 | | ]; destruct u1 as [u1 | | ];
  simpl; try (simpl;intuition;fail);
-destruct b2 as [b2 | | ]; 
- try (assert (H': b2 <> u1) 
+destruct b2 as [b2 | | ];
+ try (assert (H': b2 <> u1)
         by (intro; elim Heq; subst b2; rewrite cp_max_refl; auto));
 destruct u2 as [u2 | | ];
  try case (Zmin_irreducible_inf u1 u2);
@@ -617,12 +617,12 @@ destruct u2 as [u2 | | ];
 Qed.
 
 Lemma add_test_constraint_right_true_lb :
-  forall l1 u1 l2 u2 l u, 
+  forall l1 u1 l2 u2 l u,
     add_test_constraint_right true (l1, u1) (l2, u2) = Some (l, u) ->
     l = l1.
 intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
   unfold add_test_constraint_right;
-  try (match goal with |- context[ext_eq ?a ?b] => 
+  try (match goal with |- context[ext_eq ?a ?b] =>
          case (ext_eq a b); intros Heq
        end);
   try (simpl; intros; intuition; discriminate);
@@ -630,15 +630,15 @@ intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
 Qed.
 
 Lemma add_test_constraint_right_false_ub :
-  forall l1 u1 l2 u2 l u, 
+  forall l1 u1 l2 u2 l u,
     add_test_constraint_right false (l1, u1) (l2, u2) = Some (l, u) ->
     u = u1.
 intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
   unfold add_test_constraint_right;
-  try (match goal with |- context[ext_eq ?a ?b] => 
+  try (match goal with |- context[ext_eq ?a ?b] =>
          case (ext_eq a b); intros Heq
        end);
-  try (match goal with |- context[ext_eq ?a ?b] => 
+  try (match goal with |- context[ext_eq ?a ?b] =>
          case (ext_eq a b); intros Heq'
        end);
   try (simpl; intros; intuition; discriminate);
@@ -646,13 +646,13 @@ intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
 Qed.
 
 Lemma add_test_constraint_right_true_ub_no_cut :
-  forall l1 u1 l2 u2 l u, 
+  forall l1 u1 l2 u2 l u,
     add_test_constraint_right true (l1, u1) (l2, u2) = Some (l, u) ->
     cp_min u1 (comp_add u2 (cZ (-1))) = u1 ->
     u = u1.
 intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
   unfold add_test_constraint_right;
-  try (match goal with |- context[ext_eq ?a ?b] => 
+  try (match goal with |- context[ext_eq ?a ?b] =>
          case (ext_eq a b); intros Heq
        end);
   try (simpl; intros; intuition; discriminate);
@@ -660,15 +660,15 @@ intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
 Qed.
 
 Lemma add_test_constraint_right_false_lb_no_cut :
-  forall l1 u1 l2 u2 l u, 
+  forall l1 u1 l2 u2 l u,
     add_test_constraint_right false (l1, u1) (l2, u2) = Some (l, u) ->
     cp_max l1 l2 = l1 -> l = l1.
 intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
   unfold add_test_constraint_right;
-  try (match goal with |- context[ext_eq ?a ?b] => 
+  try (match goal with |- context[ext_eq ?a ?b] =>
          case (ext_eq a b); intros Heq
        end);
-  try (match goal with |- context[ext_eq ?a ?b] => 
+  try (match goal with |- context[ext_eq ?a ?b] =>
          case (ext_eq a b); intros Heq'
        end);
   try (simpl; intros; intuition; discriminate);
@@ -677,13 +677,13 @@ intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
 Qed.
 
 Lemma add_test_constraint_right_true_ub_cut :
-  forall l1 u1 l2 u2 l u, 
+  forall l1 u1 l2 u2 l u,
     add_test_constraint_right true (l1, u1) (l2, u2) = Some (l, u) ->
     u1 <> cp_min u1 (comp_add u2 (cZ (-1))) ->
     u = comp_add u2 (cZ (-1)).
 intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
   unfold add_test_constraint_right;
-  try (match goal with |- context[ext_eq ?a ?b] => 
+  try (match goal with |- context[ext_eq ?a ?b] =>
          case (ext_eq a b); intros Heq
        end);
   try (simpl; intros; intuition; discriminate);
@@ -695,15 +695,15 @@ intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
 Qed.
 
 Lemma add_test_constraint_right_false_lb_cut :
-  forall l1 u1 l2 u2 l u, 
+  forall l1 u1 l2 u2 l u,
     add_test_constraint_right false (l1, u1) (l2, u2) = Some (l, u) ->
     l1 <> cp_max l1 l2 -> l = l2.
 intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
   unfold add_test_constraint_right;
-  try (match goal with |- context[ext_eq ?a ?b] => 
+  try (match goal with |- context[ext_eq ?a ?b] =>
          case (ext_eq a b); intros Heq
        end);
-  try (match goal with |- context[ext_eq ?a ?b] => 
+  try (match goal with |- context[ext_eq ?a ?b] =>
          case (ext_eq a b); intros Heq'
        end);
   try (simpl; intros; intuition; discriminate);
@@ -739,7 +739,7 @@ rewrite add_test_constraint_right_true_ub_no_cut with (1:=H'); auto.
 rewrite add_test_constraint_right_true_ub_cut with (1:=H'); auto.
 intros [H1 H2][H3 H4]; split; auto.
 rewrite cp_max_comm; apply cp_max_trans with (comp_add u2 (cZ (-1))).
-destruct u2 as [u2 | | ]; destruct u2' as [u2' | | ]; simpl in *; 
+destruct u2 as [u2 | | ]; destruct u2' as [u2' | | ]; simpl in *;
   try discriminate; auto.
 assert (u2 <= u2') by (injection H4; intros a; rewrite <- a; apply Z.le_max_l).
 rewrite Zle_to_Zmax; auto; try lia.
@@ -809,12 +809,12 @@ apply add_test_constraint_right_false_monotonic.
 Qed.
 
 Lemma add_test_constraint_left_true_ub :
-  forall l1 u1 l2 u2 l u, 
+  forall l1 u1 l2 u2 l u,
     add_test_constraint_left true (l1, u1) (l2, u2) = Some (l, u) ->
     u = u2.
 intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
   unfold add_test_constraint_left;
-  try (match goal with |- context[ext_eq ?a ?b] => 
+  try (match goal with |- context[ext_eq ?a ?b] =>
          case (ext_eq a b); intros Heq
        end);
   try (simpl; intros; intuition; discriminate);
@@ -822,15 +822,15 @@ intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
 Qed.
 
 Lemma add_test_constraint_left_false_lb :
-  forall l1 u1 l2 u2 l u, 
+  forall l1 u1 l2 u2 l u,
     add_test_constraint_left false (l1, u1) (l2, u2) = Some (l, u) ->
     l = l2.
 intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
   unfold add_test_constraint_left;
-  try (match goal with |- context[ext_eq ?a ?b] => 
+  try (match goal with |- context[ext_eq ?a ?b] =>
          case (ext_eq a b); intros Heq
        end);
-  try (match goal with |- context[ext_eq ?a ?b] => 
+  try (match goal with |- context[ext_eq ?a ?b] =>
          case (ext_eq a b); intros Heq'
        end);
   try (simpl; intros; intuition; discriminate);
@@ -838,13 +838,13 @@ intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
 Qed.
 
 Lemma add_test_constraint_left_true_lb_no_cut :
-  forall l1 u1 l2 u2 l u, 
+  forall l1 u1 l2 u2 l u,
     add_test_constraint_left true (l1, u1) (l2, u2) = Some (l, u) ->
     cp_max (comp_add l1 (cZ 1)) l2 = l2 ->
     l = l2.
 intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
   unfold add_test_constraint_left;
-  try (match goal with |- context[ext_eq ?a ?b] => 
+  try (match goal with |- context[ext_eq ?a ?b] =>
          case (ext_eq a b); intros Heq
        end);
   try (simpl; intros; intuition; discriminate);
@@ -852,15 +852,15 @@ intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
 Qed.
 
 Lemma add_test_constraint_left_false_lb_no_cut :
-  forall l1 u1 l2 u2 l u, 
+  forall l1 u1 l2 u2 l u,
     add_test_constraint_left false (l1, u1) (l2, u2) = Some (l, u) ->
     cp_min u1 u2 = u2 -> u = u2.
 intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
   unfold add_test_constraint_left;
-  try (match goal with |- context[ext_eq ?a ?b] => 
+  try (match goal with |- context[ext_eq ?a ?b] =>
          case (ext_eq a b); intros Heq
        end);
-  try (match goal with |- context[ext_eq ?a ?b] => 
+  try (match goal with |- context[ext_eq ?a ?b] =>
          case (ext_eq a b); intros Heq'
        end);
   try (simpl; intros; intuition; discriminate);
@@ -868,13 +868,13 @@ intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
 Qed.
 
 Lemma add_test_constraint_left_true_lb_cut :
-  forall l1 u1 l2 u2 l u, 
+  forall l1 u1 l2 u2 l u,
     add_test_constraint_left true (l1, u1) (l2, u2) = Some (l, u) ->
     l2 <> cp_max (comp_add l1 (cZ 1)) l2 ->
     l = comp_add l1 (cZ 1).
 intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
   unfold add_test_constraint_left;
-  try (match goal with |- context[ext_eq ?a ?b] => 
+  try (match goal with |- context[ext_eq ?a ?b] =>
          case (ext_eq a b); intros Heq
        end);
   try (simpl; intros; intuition; discriminate);
@@ -885,22 +885,22 @@ intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
 Qed.
 
 Lemma add_test_constraint_left_false_lb_cut :
-  forall l1 u1 l2 u2 l u, 
+  forall l1 u1 l2 u2 l u,
     add_test_constraint_left false (l1, u1) (l2, u2) = Some (l, u) ->
     u2 <> cp_min u1 u2 -> u = u1.
 intros [l1 | | ] [u1 | | ] [l2 | | ] [u2 | | ] l u;
   unfold add_test_constraint_left;
-  try (match goal with |- context[ext_eq ?a ?b] => 
+  try (match goal with |- context[ext_eq ?a ?b] =>
          case (ext_eq a b); intros Heq
        end);
-  try (match goal with |- context[ext_eq ?a ?b] => 
+  try (match goal with |- context[ext_eq ?a ?b] =>
          case (ext_eq a b); intros Heq'
        end);
   try (simpl; intros; intuition; discriminate);
   try (intros H'; injection H'; do 2 intro; subst u l; clear H'); simpl; auto;
   (simpl; intro Hneq;
     destruct (Zmin_irreducible u1 u2) as [H|H];
-    try (rewrite H in Hneq;case Hneq; auto;fail); 
+    try (rewrite H in Hneq;case Hneq; auto;fail);
         rewrite H; auto; fail);
   simpl; auto.
 Qed.
@@ -920,7 +920,7 @@ rewrite add_test_constraint_left_true_lb_no_cut with (1:=H'); auto.
 rewrite add_test_constraint_left_true_lb_cut with (1:=H'); auto.
 intros [H1 H2][H3 H4]; split; auto.
 rewrite cp_min_comm; apply cp_min_trans with (comp_add l1 (cZ 1)).
-destruct l1 as [l1 | | ]; destruct l1' as [l1' | | ]; simpl in *; 
+destruct l1 as [l1 | | ]; destruct l1' as [l1' | | ]; simpl in *;
   try discriminate; auto.
 assert (l1' <= l1) by (injection H1; intros a; rewrite <- a; apply Z.le_min_l).
 rewrite Zle_to_Zmin; auto; try lia.
@@ -932,7 +932,7 @@ intros [H1 H2][H3 H4]; split; auto.
 rewrite cp_min_comm; apply cp_min_trans with l2.
 rewrite cp_min_comm; auto.
 apply cp_max_r_cp_min_l; rewrite cp_max_comm;
- case (cp_max_irreducible (comp_add l1 (cZ 1)) l2); 
+ case (cp_max_irreducible (comp_add l1 (cZ 1)) l2);
  try (intros; case Hl2l1; auto; fail); auto.
 rewrite add_test_constraint_left_true_lb_cut with (1:=H'); auto.
 intros [H1 H2][H3 H4]; split; auto.

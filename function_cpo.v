@@ -245,7 +245,7 @@ elim not_all_ex_not with
 intros n Hneq; exists (f n); split; [auto | intros y; auto].
 Qed.
 End opt_cpo.
-Hint Resolve option_cpo_refl option_cpo_none_bot reflexive_option_cpo : core.
+Global Hint Resolve option_cpo_refl option_cpo_none_bot reflexive_option_cpo : core.
 Arguments option_cpo : default implicits.
 
 (* SECTION: providing usable mathematical tools for a classical setting. *)
@@ -491,5 +491,5 @@ Theorem complete_f_order' : forall A, complete (f_order' A).
 intros; unfold f_order'; apply complete_f_order.
 Qed.
 
-Hint Resolve reflexive_f_order' antisymmetric_f_order' transitive_f_order'
+Global Hint Resolve reflexive_f_order' antisymmetric_f_order' transitive_f_order'
   complete_f_order' : core.

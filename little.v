@@ -18,7 +18,7 @@ Inductive aeval : env -> aexpr -> Z -> Prop :=
               aeval r e1 v1 -> aeval r e2 v2 ->
               aeval r (aplus e1 e2) (v1 + v2).
 
-Hint Resolve ae_int ae_var1 ae_var2 ae_plus : core.
+Global Hint Resolve ae_int ae_var1 ae_var2 ae_plus : core.
 
 Inductive beval : env -> bexpr -> bool -> Prop :=
 | be_lt1 : forall r e1 e2 v1 v2,
@@ -44,7 +44,7 @@ Inductive exec : env->instr->env->Prop :=
     beval r b false -> exec r (while b i) r.
 
 
-Hint Resolve be_lt1 be_lt2 s_up1 s_up2 SN1 SN2 SN3 SN4 SN5 : core.
+Global Hint Resolve be_lt1 be_lt2 s_up1 s_up2 SN1 SN2 SN3 SN4 SN5 : core.
 
 Inductive sos_step : env->instr->instr->env->Prop :=
   SOS1 : forall r r' x e v,
@@ -67,7 +67,7 @@ Inductive sos_star : env->instr->instr->env->Prop :=
              sos_step r i i' r' -> sos_star r' i' i'' r'' ->
              sos_star r i i'' r''.
 
-Hint Resolve SOS1 SOS2 SOS3 SOS5 SOS4 SOS6 SOS7 : core.
+Global Hint Resolve SOS1 SOS2 SOS3 SOS5 SOS4 SOS6 SOS7 : core.
 
 Lemma sos_star_trans :
    forall r r' r'' i i' i'',
@@ -94,7 +94,7 @@ Proof.
   intros; eapply sos_sequence_aux; eauto.
 Qed.
 
-Hint Resolve sos_sequence : core.
+Global Hint Resolve sos_sequence : core.
 
 Lemma sn_imp_sos :
  forall r r' i,  exec r i r' -> sos_star r i skip r'.
@@ -287,7 +287,7 @@ Proof with auto.
   intros Heq Heq2; injection Heq2; intros; subst...
 Qed.
 
-Hint Resolve lookup_aeval : core.
+Global Hint Resolve lookup_aeval : core.
 
 Ltac find_deep_bind a :=
   match a with
@@ -317,7 +317,7 @@ Proof with eauto.
   intros v1 Heq1 v2 Heq2 Heq; injection Heq; intros; subst...
 Qed.
 
-Hint Resolve af_eval Z.ge_le : core.
+Global Hint Resolve af_eval Z.ge_le : core.
 
 Lemma bf_eval :
   forall r e v, bf r e = Some v -> beval r e v.
@@ -343,7 +343,7 @@ Proof with eauto.
     intros r'' Heqr'' Hn Heq; injection Heq; intros; subst r'; auto.
 Qed.
 
-Hint Resolve bf_eval uf_s : core.
+Global Hint Resolve bf_eval uf_s : core.
 
 Lemma f_sos_sos_step :
  forall r i r' i', f_sos r i = Some(r',i') -> sos_step r i i' r'.
@@ -359,7 +359,7 @@ simpl in H; unbind_hyp H t Ht; destruct t; injection H; intros; subst...
 simpl in H; discriminate.
 Qed.
 
-Hint Resolve f_sos_sos_step : core.
+Global Hint Resolve f_sos_sos_step : core.
 
 Lemma f_star_sem : forall n r i r' i', f_star n r i = Some(r',i')->
  sos_star r i i' r'.
