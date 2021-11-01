@@ -21,7 +21,7 @@ Inductive char_category : Type :=
 Fixpoint Z_of_rev_string (s:string) : Z :=
  match s with
    "" => 0
- | String a tl => (Z_of_nat (nat_of_ascii a) - 
+ | String a tl => (Z_of_nat (nat_of_ascii a) -
                    Z_of_nat (nat_of_ascii "0"%char))+10*Z_of_rev_string tl
  end.
 
@@ -51,7 +51,7 @@ Definition string_token (rev_buf :string) : token :=
      T_skip
   else T_id buf.
 
-Fixpoint special_tokens (rev_buf:string) (acc:list token) {struct rev_buf}: 
+Fixpoint special_tokens (rev_buf:string) (acc:list token) {struct rev_buf}:
   option (list token) :=
   match rev_buf with
     "" => Some acc
@@ -75,7 +75,7 @@ Fixpoint special_tokens (rev_buf:string) (acc:list token) {struct rev_buf}:
 Definition Z_of_ascii (a:ascii) := Z_of_nat(nat_of_ascii a).
 
 Definition is_digit (a:ascii) : bool :=
-  match Z_of_ascii a ?= Z_of_ascii "0"%char with
+  match Z.compare (Z_of_ascii a) (Z_of_ascii "0"%char) with
     Lt => false
   | Eq => true
   | Gt => match Z_of_ascii a ?= Z_of_ascii "9"%char with
@@ -126,7 +126,7 @@ Definition cat_of_char (a:ascii) : char_category :=
 Fixpoint tokenize (s:string)(st:lex_state)(rev_buf:string) {struct s}
     :list token :=
   match s with
-    "" => 
+    "" =>
       match st with
         Start => nil
       | In_num => T_num_of_rev_string rev_buf::nil
@@ -137,7 +137,7 @@ Fixpoint tokenize (s:string)(st:lex_state)(rev_buf:string) {struct s}
       end
   | String a s' =>
       match st with
-        Start => 
+        Start =>
           match cat_of_char a with
             Digit =>
             tokenize s' In_num (String a "")
@@ -160,7 +160,7 @@ Fixpoint tokenize (s:string)(st:lex_state)(rev_buf:string) {struct s}
           | Other =>
             T_num (Z_of_rev_string rev_buf)::tokenize s' In_spec (String a "")
           end
-      | In_id => 
+      | In_id =>
           match cat_of_char a with
             Digit =>
             tokenize s' In_id (String a rev_buf)
@@ -210,7 +210,7 @@ Fixpoint parse_variables (l:list token) :
     | None => None
     end
   | _ => None
-  
+
   end.
 
 Definition parse_right_expr (f:list token -> nat -> option(aexpr*list token)):
@@ -257,7 +257,7 @@ Fixpoint parse_expr (l:list token)(n:nat){struct n}
 
 Fixpoint parse_expr_list(l:list token)(n:nat) {struct n}:
   (list aexpr)*list token :=
-  match n with 
+  match n with
     0%nat => (nil,l)
   | S p =>
     match parse_expr l n with
@@ -288,7 +288,7 @@ match parse_bexpr l n with
 | None =>
   match n with
     0%nat => None
-  | S p => 
+  | S p =>
     match l with
       T_id s::T_open::tl =>
       let (l, tl) := parse_expr_list tl n in
@@ -296,7 +296,7 @@ match parse_bexpr l n with
         T_close::tl => Some(pred s l, tl)
       | _ => None
       end
-    | T_bang::l => 
+    | T_bang::l =>
       match parse_elem_assert l p with
         Some(a, l) => Some(a_not a, l)
       | _ => None
@@ -308,11 +308,11 @@ end.
 
 Fixpoint parse_assert (l:list token)(n:nat) {struct n}:
   option(assert*list token) :=
-match n with 
+match n with
   0%nat => None
 | S p =>
   match parse_elem_assert l p with
-    Some(a1, T_conj::tl) => 
+    Some(a1, T_conj::tl) =>
     match parse_assert tl p with
       Some(a2, tl) => Some(a_conj a1 a2, tl)
     | None => None
@@ -322,7 +322,7 @@ match n with
   end
 end.
 
-Definition parse_elem_instr 
+Definition parse_elem_instr
    (parse_instr:list token -> nat -> option(instr*list token))
    (l:list token)(n:nat) :option(instr*list token) :=
  match l with
@@ -350,7 +350,7 @@ Definition parse_elem_instr
  | _ => None
  end.
 
-Definition parse_elem_a_instr 
+Definition parse_elem_a_instr
    (parse_instr:list token -> nat -> option(a_instr*list token)) :=
 fix peai (l:list token)(n:nat){struct n} : option(a_instr*list token):=
  match n with
@@ -376,7 +376,7 @@ fix peai (l:list token)(n:nat){struct n} : option(a_instr*list token):=
      match parse_bexpr tl n with
        Some(b,T_do::T_open_S::tl) =>
        match parse_assert tl n with
-         Some(a,T_close_S::tl) => 
+         Some(a,T_close_S::tl) =>
          match parse_instr tl n with
            Some(i,T_done::tl) =>
            Some(a_while b a i, tl)
@@ -399,7 +399,7 @@ Fixpoint parse_a_instr (l:list token)(n:nat){struct n} :
   option(a_instr*list token) :=
   match n with
     0%nat => None
-  | S p => 
+  | S p =>
     match parse_elem_a_instr parse_a_instr l p with
       Some(i,tl) as it =>
       match tl with
@@ -415,11 +415,11 @@ Fixpoint parse_a_instr (l:list token)(n:nat){struct n} :
     end
   end.
 
-Fixpoint parse_instr (l:list token) (n:nat) {struct n} : 
+Fixpoint parse_instr (l:list token) (n:nat) {struct n} :
   option(instr*list token) :=
   match n with
     0%nat => None
-  | S p => 
+  | S p =>
     match parse_elem_instr parse_instr l p with
       Some(i,tl) as it =>
       match tl with
@@ -440,7 +440,7 @@ Definition parse_program (l:list token) :
    match l with
      T_variables::tl =>
      match parse_variables tl with
-       Some(l,r) => 
+       Some(l,r) =>
         match parse_instr r (List.length r) with
           Some (i, T_end::nil) => Some(l,i)
         | _ => None
@@ -454,7 +454,7 @@ Definition parse_a (s:string) :=
    match tokenize s Start "" with
      T_variables::tl =>
      match parse_variables tl with
-       Some(l,r) => 
+       Some(l,r) =>
         match parse_a_instr r (List.length r) with
           Some (i, T_end::nil) => Some(l,i)
         | _ => None
@@ -467,7 +467,7 @@ Definition parse_a (s:string) :=
 Definition parse (s : string) : option((list(string*Z))*instr) :=
   parse_program (tokenize s Start "").
 
-Definition parse_instr' (s:string) := 
+Definition parse_instr' (s:string) :=
    let l := tokenize s Start "" in
    match parse_a_instr l (List.length l) with
      Some (i, nil) => i
@@ -493,7 +493,7 @@ Fixpoint string_of_Z_aux2 (p:positive)(x:Z)(acc:string){struct p} : string :=
   end.
 
 Definition string_of_Z (x:Z) : string :=
-  match x with 
+  match x with
     0 => "0"
   | Zpos p => string_of_Z_aux2 (xI (xI p)) x ""
   | Zneg p => String "-" (string_of_Z_aux2 (xI (xI p)) (Zpos p) "")
@@ -526,9 +526,9 @@ Definition string_of_bexpr (e:bexpr) :string :=
 Fixpoint string_of_instr (i:instr) :string :=
   match i with
     skip => "skip"
-  | sequence ((sequence _ _) as i1) i2 => 
+  | sequence ((sequence _ _) as i1) i2 =>
      "{" ++ string_of_instr i1 ++ "};" ++ eol ++ string_of_instr i2
-  | sequence i1 i2 => 
+  | sequence i1 i2 =>
     string_of_instr i1 ++ ";" ++ eol ++ string_of_instr i2
   | assign x e => x ++ ":=" ++ string_of_aexpr e
   | while b i => "while " ++ string_of_bexpr b ++ " do" ++ eol ++
@@ -553,9 +553,9 @@ Fixpoint string_of_assert (a:assert) :string :=
 Fixpoint string_of_a_instr (i:a_instr) :string :=
 match i with
   a_skip => "skip"
-  | a_sequence ((a_sequence _ _) as i1) i2 => 
+  | a_sequence ((a_sequence _ _) as i1) i2 =>
      "{" ++ string_of_a_instr i1 ++ "};" ++ eol ++ string_of_a_instr i2
-  | a_sequence i1 i2 => 
+  | a_sequence i1 i2 =>
     string_of_a_instr i1 ++ ";" ++ eol ++ string_of_a_instr i2
   | a_assign x e => x ++ ":=" ++ string_of_aexpr e
   | a_while b a i => "while " ++ string_of_bexpr b ++ " do" ++ eol ++
@@ -567,12 +567,12 @@ match i with
 
 Definition interp (n:nat) (s:string) : string :=
    match parse s with
-     Some(r,i) => 
+     Some(r,i) =>
      match f_star n r i with
        Some (l,skip) => "Complete computation" ++ eol ++
                         string_of_env l
      | Some (l,i) => "Incomplete computation" ++ eol ++
-                      "variables " ++ string_of_env l ++ " in" ++ 
+                      "variables " ++ string_of_env l ++ " in" ++
                       eol ++ string_of_instr i ++ "end"
      | None => "An error occured while executing"
      end
@@ -584,7 +584,7 @@ Definition PP (s:string) := True.
 Ltac pretty_hyp_curses id id1 :=
   match type of id with
     exec ?r ?i ?r' => idtac "ok";
-    let res := eval vm_compute in 
+    let res := eval vm_compute in
          ("execution in state " ++ eol ++ string_of_env r ++ eol ++
                 "of instruction" ++ eol ++ String "027" "[0;31;48m" ++
                 string_of_instr i ++ String "027" "[0;30;48m" ++ eol ++
@@ -595,7 +595,7 @@ Ltac pretty_hyp_curses id id1 :=
 Ltac pretty_hyp id :=
   match type of id with
     exec ?r ?i ?r' => idtac "ok";
-    let res := eval vm_compute in 
+    let res := eval vm_compute in
          ("execution in state " ++ eol ++ string_of_env r ++ eol ++
                 "of instruction" ++ eol ++ string_of_instr i ++ eol ++
                 "terminates and yields" ++ eol ++ string_of_env r') in
@@ -611,7 +611,7 @@ Definition parse_assert' (s:string) :=
 
 Ltac parse_it :=
   match goal with
-    |- context[parse_assert' ?x]=> 
+    |- context[parse_assert' ?x]=>
     let v := eval vm_compute in (parse_assert' x) in
        change (parse_assert' x) with v; parse_it
   | |- context[parse_instr' ?x] =>
