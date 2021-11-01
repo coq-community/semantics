@@ -39,7 +39,7 @@ Definition asm_step_new_pc (stack mem : list Z) (i : assembly) (pc : nat) :
   | store n => pc + 1
   | goto n => n
   | branch n => 
-    if (hd 0 stack =? 0)%Z then n else pc + 1
+    if (hd 0 stack =? Z.b2z true)%Z then n else pc + 1
   end.
 
 Fixpoint set_nth (l : list Z)(i : nat)(v : Z) :=
@@ -301,7 +301,7 @@ destruct (S.string_dec x y) as [abs | _];[ now case xny |].
 now rewrite Ih.
 Qed.
 
-Lemma set_nth_index r x v r' z :
+Lemma update_index r x v r' z :
   s_update r x v r' ->
   symbol_index r z = symbol_index r' z.
 Proof.
@@ -310,35 +310,58 @@ induction 1 as [r x v v' | r r' x y v v' up Ih xny].
 now simpl; rewrite Ih.
 Qed.
 
-Lemma set_nth_compile_aexp r x v r' e :
+Lemma update_compile_aexp r x v r' e :
   s_update r x v r' ->
   compile_aexp r e = compile_aexp r' e.
 Proof.
 intros up; induction e as [n | y | e1 Ih1 e2 Ih2].
-    now simpl; rewrite (set_nth_index _ _ _ _ _ up).
+    now simpl; rewrite (update_index _ _ _ _ _ up).
   easy.
 now simpl; rewrite Ih1, Ih2.
 Qed.
 
-Lemma set_nth_compile_bexp r x v r' e :
+Lemma update_compile_bexp r x v r' e :
   s_update r x v r' ->
   compile_bexp r e = compile_bexp r' e.
 Proof.
 intros up; induction e as [e1 e2].
-now simpl; rewrite !(set_nth_compile_aexp _ _ _ _ _ up).
+now simpl; rewrite !(update_compile_aexp _ _ _ _ _ up).
 Qed.
 
-Lemma set_nth_compile_instr r x v r' i n :
+Lemma update_compile_instr r x v r' i n :
   s_update r x v r' ->
   compile_instr r n i = compile_instr r' n i.
 Proof.
 intros up; revert n; induction i as [y e | i1 Ih1 i2 Ih2| b i Ih| ].
-      now intros n; simpl; rewrite (set_nth_index _ _ _ _ _ up),
-        (set_nth_compile_aexp _ _ _ _ _ up).
+      now intros n; simpl; rewrite (update_index _ _ _ _ _ up),
+        (update_compile_aexp _ _ _ _ _ up).
     intros n; simpl.
     now rewrite Ih1, Ih2.
-  intros n; simpl; rewrite (set_nth_compile_bexp _ _ _ _ _ up).
+  intros n; simpl; rewrite (update_compile_bexp _ _ _ _ _ up).
   now rewrite Ih.
+easy.
+Qed.
+
+Lemma exec_compile_aexp r i1 r' a :
+  exec r i1 r' -> compile_aexp r a = compile_aexp r' a.
+Proof.
+induction 1 as [ r | r r' s e v ev up| r r' r'' i1_1 i1_2 ex1 Ih1 ex2 Ih2 |
+                     r r' r'' b i ev ex1 Ih1 ex2 Ih2|  ]; try easy.
+    now apply (update_compile_aexp _ _ _ _ _ up).
+  now rewrite <- Ih2.
+now rewrite <- Ih2.
+Qed.
+
+Lemma exec_compile_instr r i1 r' i2 n :
+  exec r i1 r' ->
+  compile_instr r n i2 = compile_instr r' n i2.
+Proof.
+induction 1 as [ r | r r' s e v ev up| r r' r'' i1_1 i1_2 ex1 Ih1 ex2 Ih2 |
+                     r r' r'' b i ev ex1 Ih1 ex2 Ih2|  ].
+        easy.
+      now apply (update_compile_instr _ _ _ _ _ _ up).
+    now rewrite <- Ih2.
+  now rewrite <- Ih2.
 easy.
 Qed.
 
@@ -353,7 +376,8 @@ Lemma exec_instr :
 Proof.
 intros env env' i pg1 pg2 stk dyn; revert pg1 pg2 stk.
 induction dyn as [ | env env' x e v ev up |
-   env env' env'' i1 i2 dyn1 Ih1 dyn2 Ih2| | ].
+   env env' env'' i1 i2 dyn1 Ih1 dyn2 Ih2|
+   env env' env''  [e1 e2] i ev dyn1 Ih1 dyn2 Ih2 | env [e1 e2] i ev ].
         intros pg1 pg2 stk.
         now exists 0%nat; simpl; rewrite Nat.add_0_r.
       intros pg1 pg2 stk.
@@ -378,4 +402,98 @@ induction dyn as [ | env env' x e v ev up |
     revert Pec1; set (pg := (pg1 ++ _)); intros Pec1.
     destruct (Ih2 (pg1 ++ (compile_instr env (length pg1) i1)) pg2 stk)
         as [ec2 Pec2].
-    revert Pec2; rewrite <-!app_assoc, app_length; fold pg.
+    revert Pec2; rewrite <-!app_assoc, app_length.
+    rewrite <-! (exec_compile_instr _ _ _ _ _ dyn1); fold pg; intros Pec2.
+    simpl; rewrite <-!app_assoc, !app_length; fold pg.
+    exists (ec1 + ec2)%nat.
+    assert (t1 := exec_asm_seq pg _ _ _ _ _ ec2 _ _ Pec1).
+    now rewrite t1, Pec2; rewrite !Nat.add_assoc.
+  intros pg1 pg2 stk.
+  cbn [compile_instr compile_bexp].
+  rewrite !app_length, !Nat.add_assoc, <-! app_assoc.
+  repeat simpl (length [_]).
+  set (middle_pc := (_ + 1 + 1)%nat).
+  set (last_pc := (_ + 2)%nat).
+  change (branch last_pc :: compile_instr env middle_pc i ++ [goto (length pg1)])
+     with
+   ([branch last_pc] ++ compile_instr env middle_pc i ++ [goto (length pg1)]).
+  rewrite <-!app_assoc.
+  set (pg := pg1 ++ _).
+  destruct (exec_bexp _ _ _ _ pg1
+              ([branch last_pc] ++
+               compile_instr env (length pg1 +
+                 length (compile_bexp env (blt e1 e2)) + 1) i
+                ++ [goto (length pg1)] ++ pg2) stk ev) as [ec1 Pec1].
+  revert Pec1; cbn [compile_instr compile_bexp].
+  rewrite !app_length, !Nat.add_assoc, <- !app_assoc.
+  simpl (length [ _ ]); fold middle_pc; fold pg; intros Pec1.
+  destruct (Ih1 (pg1 ++ compile_bexp env (blt e1 e2) ++ [branch last_pc])
+              ([goto (length pg1)] ++ pg2) stk) as [ec2 Pec2].
+  revert Pec2; cbn [compile_instr compile_bexp].
+  rewrite !app_length, !Nat.add_assoc, <- !app_assoc.
+  simpl (length [cmp]); simpl (length [branch _]).
+  fold middle_pc; fold pg; intros Pec2.
+  destruct (Ih2 pg1 pg2 stk) as [ec3 Pec3].
+  revert Pec3; cbn [compile_instr compile_bexp].
+  rewrite !app_length, !Nat.add_assoc, <- !app_assoc.
+  simpl (length [cmp]); simpl (length [branch _]).
+  rewrite <-! (exec_compile_aexp _ _ _ _ dyn1).
+  rewrite <-! (exec_compile_instr _ _ _ _ _ dyn1).
+  fold middle_pc; fold last_pc.
+  change (branch last_pc :: compile_instr env middle_pc i ++
+          [goto (length pg1)]) with
+     ([branch last_pc] ++ compile_instr env middle_pc i ++ [goto (length pg1)]).
+  rewrite <- !app_assoc; fold pg; intros Pec3.
+  exists (ec1 + (1 + (ec2 + (1 + ec3))))%nat.
+  rewrite (exec_asm_seq pg _ (Z.b2z (negb true) :: stk) _ _ _ _ _ _ Pec1).
+  rewrite (exec_asm_seq pg (Z.b2z (negb true) :: stk) stk (env_to_mem env)
+             (env_to_mem env) 1 (ec2 + (1 + ec3))
+             (length pg1 + length (compile_aexp env e1) +
+                  length (compile_aexp env e2) + 1) middle_pc); cycle 1.
+    simpl; unfold pg; rewrite <-!Nat.add_assoc.
+    repeat (rewrite nth_error_app2, minus_plus; [ | lia]).
+    now simpl; rewrite !Nat.add_assoc.
+  rewrite (exec_asm_seq pg _ stk _ _ _ _ _ _ Pec2).
+  rewrite (exec_asm_seq pg stk stk (env_to_mem env')
+             (env_to_mem env') 1 ec3 _ (length pg1)); cycle 1.
+    simpl; unfold pg, middle_pc; rewrite <-!Nat.add_assoc.
+    repeat (rewrite nth_error_app2, minus_plus; [ | lia]).
+    simpl.
+    repeat (rewrite nth_error_app2, minus_plus; [ | lia]).
+    simpl.
+    set (L := length (compile_instr _ _ _)); rewrite <- (Nat.add_0_r L).
+    unfold L.
+    repeat (rewrite nth_error_app2, minus_plus; [ | lia]).
+    easy.
+  rewrite Pec3; unfold middle_pc; rewrite !app_length; simpl (length [_]).
+  now rewrite !Nat.add_assoc.
+intros pg1 pg2 stk.
+cbn [compile_instr compile_bexp].
+rewrite !app_length, !Nat.add_assoc, <-! app_assoc.
+repeat simpl (length [_]).
+set (middle_pc := (_ + 1 + 1)%nat).
+set (last_pc := (_ + 2)%nat).
+change (branch last_pc :: compile_instr env middle_pc i ++ [goto (length pg1)])
+    with
+ ([branch last_pc] ++ compile_instr env middle_pc i ++ [goto (length pg1)]).
+rewrite <-!app_assoc.
+set (pg := pg1 ++ _).
+destruct (exec_bexp _ _ _ _ pg1
+            ([branch last_pc] ++
+             compile_instr env (length pg1 +
+               length (compile_bexp env (blt e1 e2)) + 1) i
+              ++ [goto (length pg1)] ++ pg2) stk ev) as [ec1 Pec1].
+revert Pec1; cbn [compile_instr compile_bexp].
+rewrite !app_length, !Nat.add_assoc, <- !app_assoc.
+simpl (length [ _ ]); fold middle_pc; fold pg; intros Pec1.
+exists (ec1 + 1)%nat.
+rewrite (exec_asm_seq _ _ (Z.b2z (negb false) :: stk) _ _ _ 1 _ _ Pec1).
+simpl.
+unfold pg; rewrite <-!Nat.add_assoc.
+repeat (rewrite nth_error_app2, minus_plus; [ | lia]).
+simpl.
+unfold last_pc, middle_pc.
+apply f_equal; lia.
+Qed.
+
+End compiler_proofs.
