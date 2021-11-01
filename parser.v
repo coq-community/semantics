@@ -78,7 +78,7 @@ Definition is_digit (a:ascii) : bool :=
   match Z.compare (Z_of_ascii a) (Z_of_ascii "0"%char) with
     Lt => false
   | Eq => true
-  | Gt => match Z_of_ascii a ?= Z_of_ascii "9"%char with
+  | Gt => match Z.compare (Z_of_ascii a) (Z_of_ascii "9"%char) with
       Gt => false
     | _ =>  true
     end
@@ -88,16 +88,16 @@ Fact example_is_digit : is_digit "8" = true.
 Proof refl_equal true.
 
 Definition is_alpha (a:ascii) : bool :=
-  match Z_of_ascii a ?= Z_of_ascii "A"%char with
+  match Z.compare (Z_of_ascii a) (Z_of_ascii "A"%char) with
     Lt => false
   | Eq => true
-  | Gt => match Z_of_ascii a ?= Z_of_ascii "Z"%char with
-      Gt => match Z_of_ascii a ?= Z_of_ascii "_"%char with
+  | Gt => match Z.compare (Z_of_ascii a) (Z_of_ascii "Z"%char) with
+      Gt => match Z.compare (Z_of_ascii a) (Z_of_ascii "_"%char) with
         Eq => true
-      | _ => match Z_of_ascii a ?= Z_of_ascii "a"%char with
+      | _ => match Z.compare (Z_of_ascii a) (Z_of_ascii "a"%char) with
           Lt => false
         | Eq => true
-        | Gt => match Z_of_ascii a ?= Z_of_ascii "z"%char with
+        | Gt => match Z.compare (Z_of_ascii a) (Z_of_ascii "z"%char) with
             Gt => false
           | _ => true
           end
