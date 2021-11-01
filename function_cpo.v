@@ -1,5 +1,5 @@
 Require Export Relations Classical ClassicalEpsilon Zwf.
-Require Export Compare_dec Omega.
+Require Export Compare_dec.
 Require Export List ZArith.
 
 (* SECTION: Proving Tarski's fixpoint theorem. *)
