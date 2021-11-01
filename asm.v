@@ -365,7 +365,7 @@ induction 1 as [ r | r r' s e v ev up| r r' r'' i1_1 i1_2 ex1 Ih1 ex2 Ih2 |
 easy.
 Qed.
 
-Lemma exec_instr :
+Lemma compile_instr_complete :
   forall env env' i pg1 pg2 stk,
   exec env i env' ->
   exists ec, 
