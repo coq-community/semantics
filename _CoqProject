@@ -15,3 +15,4 @@ little.v
 little_w_string.v
 parser.v
 syntax.v
+asm.v
