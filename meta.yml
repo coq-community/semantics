@@ -76,8 +76,7 @@ keywords:
 - name: intervals
 
 categories:
-- name: Computer Science/Semantics
-- name: Compilation/Semantics
+- name: Computer Science/Semantics and Compilation/Semantics
 
 documentation: |
   ## Description
