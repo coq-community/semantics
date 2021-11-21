@@ -45,7 +45,9 @@ also provided in Coq, but there are no proofs associated.
   - Kartik Singhal ([**@k4rtik**](https://github.com/k4rtik))
 - License: [MIT License](LICENSE)
 - Compatible Coq versions: 8.10 or later
-- Additional dependencies: none
+- Additional dependencies:
+  - [num](https://opam.ocaml.org/packages/num/)
+  - [ocamlbuild](https://github.com/ocaml/ocamlbuild)
 - Coq namespace: `Semantics`
 - Related publication(s):
   - [Theorem proving support in programming language semantics](https://hal.inria.fr/inria-00160309) doi:[10.1017/CBO9780511770524.016](https://doi.org/10.1017/CBO9780511770524.016)
@@ -121,18 +123,18 @@ programming language using the Coq system.
   the proved tools.
 
 `asm.v`  This file contains the description of a simple assembly language and
-a compiler from the little language to this assembly language.  The machine
-modeled in this assembly language is a stack machine with a random access
-memory, both modeled as lists of integers.  This assembly
-language has an unconditional branching instruction `goto`, and a conditional
-branching instruction `branch`, which interprets the top value of the stack
-as a boolean value, through the coercion from `Z` to `bool` given by
-`Z.b2z`.  If the top value is `Z.b2z true`, then branching at the prescribed
-address occurs, otherwise control flow passes to the next instruction in the
-program.  The compiler comes with a partial proof of correctness, expressing
-that when an instruction executes and terminates, the compiled expression
-can also be executed in a memory faithful to the environment, and execution
-proceeds until the program counter reaches the end of the compiled expression.
+  a compiler from the little language to this assembly language.  The machine
+  modeled in this assembly language is a stack machine with a random access
+  memory, both modeled as lists of integers.  This assembly
+  language has an unconditional branching instruction `goto`, and a conditional
+  branching instruction `branch`, which interprets the top value of the stack
+  as a boolean value, through the coercion from `Z` to `bool` given by
+  `Z.b2z`.  If the top value is `Z.b2z true`, then branching at the prescribed
+  address occurs, otherwise control flow passes to the next instruction in the
+  program.  The compiler comes with a partial proof of correctness, expressing
+  that when an instruction executes and terminates, the compiled expression
+  can also be executed in a memory faithful to the environment, and execution
+  proceeds until the program counter reaches the end of the compiled expression.
 
 This development also comes with ml files used to encapsulate the extracted
 code.
