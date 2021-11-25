@@ -9,7 +9,7 @@
 let big_int2 = big_int_of_int 2
 
 let z_of_big_int n =
-    let rec f n = if eq_big_int n unit_big_int then Interp.XH 
+    let rec f n = if eq_big_int n unit_big_int then Interp.XH
                 else let q,r = quomod_big_int n big_int2 in
                   if eq_big_int r unit_big_int then Interp.XI(f q)
                   else Interp.XO(f q) in
@@ -24,7 +24,7 @@ let rec mk_precs l i =
 
 %}
 %token VARIABLES IN END WHILE DO DONE ASSIGN PLUS MINUS COMMA CONJ BANG
-%token SEMICOLUMN OPEN CLOSE BOPEN BCLOSE SKIP LT SOPEN SCLOSE MINFTY PINFTY
+%token SEMICOLON OPEN CLOSE BOPEN BCLOSE SKIP LT SOPEN SCLOSE MINFTY PINFTY
 %token <Big_int.big_int> NUM
 %token <string> ID
 %left PLUS
@@ -57,24 +57,24 @@ environment : { nil }
 | variable_value environment { c $1 $2 }
 ;
 inst: elem_inst {$1}
-|  elem_inst SEMICOLUMN inst { Interp.A_sequence($1,$3) }
+|  elem_inst SEMICOLON inst { Interp.A_sequence($1,$3) }
 ;
 elem_inst : elem_inst0 {$1}
 | SOPEN l_assert SCLOSE elem_inst {Interp.Prec($2,$4)}
 ;
 
-elem_inst0 : BOPEN inst BCLOSE { $2 } 
+elem_inst0 : BOPEN inst BCLOSE { $2 }
 |  SKIP { Interp.A_skip }
-|  WHILE b_exp DO inst DONE 
+|  WHILE b_exp DO inst DONE
      {match $4 with Interp.Prec(a,i) -> Interp.A_while($2,a, i)
          | Interp.A_sequence(Interp.Prec(a,i),j) ->
            Interp.A_while($2, a, Interp.A_sequence(i, j))
          | it -> Interp.A_while($2, false_assert, it)}
 |  identifier ASSIGN exp { Interp.A_assign($1,$3) }
 ;
-inst_with_post : 
+inst_with_post :
   elem_inst SOPEN l_assert SCLOSE {($1,$3)}
-| elem_inst SEMICOLUMN inst_with_post 
+| elem_inst SEMICOLON inst_with_post
    {let a,b = $3 in Interp.A_sequence($1,a), b }
 ;
 exp: num { Interp.Anum($1) }

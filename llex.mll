@@ -7,7 +7,7 @@
 rule token = parse
   [ ' ' '\t' ] {token lexbuf}
 | ['\n'] {count:=!count+1; token lexbuf}
-| ":=" {ASSIGN} | ";" {SEMICOLUMN} | "/\\" {CONJ} | "!" {BANG}
+| ":=" {ASSIGN} | ";" {SEMICOLON} | "/\\" {CONJ} | "!" {BANG}
 | "while" {WHILE} | "do" {DO} | "done" {DONE} | "[" {SOPEN} | "]" {SCLOSE}
 | "variables" {VARIABLES} | "in" {IN} | "end" {END} | "<" {LT} | "-" {MINUS}
 | "," {COMMA} | "(" {OPEN} | ")" {CLOSE} | "skip" {SKIP} | "+" {PLUS}

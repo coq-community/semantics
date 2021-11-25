@@ -7,7 +7,7 @@ Inductive lex_state : Type :=
 
 Inductive token : Type :=
   T_id (_ : string) | T_num (_ : Z) | T_variables | T_in | T_end
-| T_semicolumn | T_assign | T_lt | T_plus | T_skip | T_while
+| T_semicolon | T_assign | T_lt | T_plus | T_skip | T_while
 | T_do | T_done | T_open | T_close | T_open_B | T_close_B
 | T_minus | T_comma | T_bang | T_conj | T_open_S | T_close_S.
 
@@ -55,7 +55,7 @@ Fixpoint special_tokens (rev_buf:string) (acc:list token) {struct rev_buf}:
   option (list token) :=
   match rev_buf with
     "" => Some acc
-  | String ";" tl => special_tokens tl (T_semicolumn::acc)
+  | String ";" tl => special_tokens tl (T_semicolon::acc)
   | String "=" (String ":" tl) => special_tokens tl (T_assign::acc)
   | String "<" tl => special_tokens tl (T_lt::acc)
   | String "+" tl => special_tokens tl (T_plus::acc)
@@ -199,12 +199,12 @@ Fixpoint parse_variables (l:list token) :
   match l with
     T_id s::T_minus::T_num n::T_in::tl => Some((s,-n)::nil, tl)
   | T_id s::T_num n::T_in::tl => Some((s,n)::nil, tl)
-  | T_id s::T_minus::T_num n::T_semicolumn::tl =>
+  | T_id s::T_minus::T_num n::T_semicolon::tl =>
     match parse_variables tl with
       Some(l,r) => Some((s,-n)::l,r)
     | None => None
     end
-  | T_id s::T_num n::T_semicolumn::tl =>
+  | T_id s::T_num n::T_semicolon::tl =>
     match parse_variables tl with
       Some(l,r) => Some((s,n)::l,r)
     | None => None
@@ -403,7 +403,7 @@ Fixpoint parse_a_instr (l:list token)(n:nat){struct n} :
     match parse_elem_a_instr parse_a_instr l p with
       Some(i,tl) as it =>
       match tl with
-        T_semicolumn::tl =>
+        T_semicolon::tl =>
         match parse_a_instr tl p with
           Some(i', tl) =>
           Some(a_sequence i i', tl)
@@ -423,7 +423,7 @@ Fixpoint parse_instr (l:list token) (n:nat) {struct n} :
     match parse_elem_instr parse_instr l p with
       Some(i,tl) as it =>
       match tl with
-        T_semicolumn::tl =>
+        T_semicolon::tl =>
         match parse_instr tl p with
           Some(i', tl) =>
           Some(sequence i i', tl)
@@ -574,9 +574,9 @@ Definition interp (n:nat) (s:string) : string :=
      | Some (l,i) => "Incomplete computation" ++ eol ++
                       "variables " ++ string_of_env l ++ " in" ++
                       eol ++ string_of_instr i ++ "end"
-     | None => "An error occured while executing"
+     | None => "An error occurred while executing"
      end
-   | None => "An error occured while parsing"
+   | None => "An error occurred while parsing"
    end.
 
 Definition PP (s:string) := True.

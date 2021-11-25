@@ -92,7 +92,7 @@ programming language using the Coq system.
   semantics.  This file also contains the proof that denotational semantics
   and natural semantics are equivalent.
 
-`axiom.v` Hoare triples and Dijkstra's weakest pre-condition calculs, in the form
+`axiom.v` Hoare triples and Dijkstra's weakest pre-condition calculus, in the form
   of a verification condition generator.  This   file also contains a proof that
   the axiomatic semantics (base on Hoare triples) and the vcg are sound with
   respect to the natural semantics.
